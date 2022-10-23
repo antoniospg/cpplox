@@ -25,7 +25,22 @@ void Lexer::report(int line, string where, string message) {
   err = true;
 }
 
-char Lexer::consume() { return src[current++]; }
+inline char Lexer::consume() { return src[current++]; }
+
+inline bool Lexer::srcEnd() { return current >= src.size(); }
+
+inline char Lexer::lookahead() { return (srcEnd() ? '\0' : src[current]); }
+
+bool Lexer::match(char expect) {
+  if (srcEnd()) return false;
+
+  if (src[current] == expect) {
+    current++;
+    return true;
+  }
+
+  return false;
+}
 
 void Lexer::addToken(TokenType type) { addToken(type, ""); }
 
@@ -37,6 +52,7 @@ void Lexer::consumeToken() {
   char c = consume();
 
   switch (c) {
+    // Single char tokens
     case '(':
       addToken(LEFT_PAREN);
       break;
@@ -74,12 +90,34 @@ void Lexer::consumeToken() {
       error(line, string("Unexpected character: ") + c);
       err = true;
       break;
+
+    // 2 char tokens
+    case '!':
+      addToken(match('=') ? BANG_EQUAL : BANG);
+      break;
+    case '=':
+      addToken(match('=') ? EQUAL_EQUAL : EQUAL);
+      break;
+    case '<':
+      addToken(match('=') ? LESS_EQUAL : LESS);
+      break;
+    case '>':
+      addToken(match('=') ? GREATER_EQUAL : GREATER);
+      break;
+
+    // Slashes
+    case '/':
+      if (match('/'))
+        while (lookahead() != '\n' && !srcEnd()) consume();
+      else
+        addToken(SLASH);
+      break;
   }
 }
 
 void Lexer::getTokens() {
   std::cout << "Start lexing..." << std::endl;
-  while (current < src.size()) {
+  while (!srcEnd()) {
     start = current;
     consumeToken();
   }

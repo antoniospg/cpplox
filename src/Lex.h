@@ -76,7 +76,13 @@ class Lexer {
 
   void getTokens();
 
-  char consume();
+  inline char consume();
+
+  inline bool srcEnd();
+
+  inline char lookahead();
+
+  bool match(char expect);
 
   void consumeToken();
 
