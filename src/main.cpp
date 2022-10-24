@@ -36,7 +36,7 @@ int repl() {
   for (;;) {
     string line;
     std::cout << "cpplox>";
-    std::cin >> line;
+    std::getline(std::cin, line);
 
     if (std::cin.eof()) {
       std::cout << std::endl;
@@ -44,6 +44,7 @@ int repl() {
     }
 
     run(line);
+    std::cout << "endl line" << std::endl;
   }
 
   return 0;

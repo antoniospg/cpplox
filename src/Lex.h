@@ -1,9 +1,9 @@
 #ifndef LEX_H
 #define LEX_H
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 typedef std::string string;
 

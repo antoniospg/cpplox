@@ -4,12 +4,17 @@
 
 typedef std::string string;
 
+std::map<TokenType, string> tok_to_string;
+
 // ----------------------------------------
 // Token function definitions
 Token::Token(TokenType type, string lexeme, string literal)
     : type(type), lexeme(lexeme), literal(literal) {}
 
-string Token::show_val() { return lexeme + " " + literal; }
+string Token::show_val() {
+  return string("type: '" + tok_to_string[type] + "' lexeme: '" + lexeme +
+                "' literal: '" + literal + "'");
+}
 
 // ----------------------------------------
 // Lexer function definitions
@@ -33,6 +38,47 @@ Lexer::Lexer(string src) : src(src), start(0), current(0), line(1) {
   keywords["true"] = TRUE;
   keywords["var"] = VAR;
   keywords["while"] = WHILE;
+
+  // Enum To string
+  tok_to_string[LEFT_PAREN] = "LEFT_PAREN";
+  tok_to_string[RIGHT_PAREN] = "RIGHT_PAREN";
+  tok_to_string[LEFT_BRACE] = "LEFT_BRACE";
+  tok_to_string[RIGHT_BRACE] = "RIGHT_BRACE";
+  tok_to_string[COMMA] = "COMMA";
+  tok_to_string[DOT] = "DOT";
+  tok_to_string[MINUS] = "MINUS";
+  tok_to_string[PLUS] = "PLUS";
+  tok_to_string[SEMICOLON] = "SEMICOLON";
+  tok_to_string[SLASH] = "SLASH";
+  tok_to_string[STAR] = "STAR";
+  tok_to_string[BANG] = "BANG";
+  tok_to_string[BANG_EQUAL] = "BANG_EQUAL";
+  tok_to_string[EQUAL] = "EQUAL";
+  tok_to_string[EQUAL_EQUAL] = "EQUAL_EQUAL";
+  tok_to_string[GREATER] = "GREATER";
+  tok_to_string[GREATER_EQUAL] = "GREATER_EQUAL";
+  tok_to_string[LESS] = "LESS";
+  tok_to_string[LESS_EQUAL] = "LESS_EQUAL";
+  tok_to_string[IDENTIFIER] = "IDENTIFIER";
+  tok_to_string[STRING] = "STRING";
+  tok_to_string[NUMBER] = "NUMBER";
+  tok_to_string[AND] = "AND";
+  tok_to_string[CLASS] = "CLASS";
+  tok_to_string[ELSE] = "ELSE";
+  tok_to_string[FALSE] = "FALSE";
+  tok_to_string[FUN] = "FUN";
+  tok_to_string[FOR] = "FOR";
+  tok_to_string[IF] = "IF";
+  tok_to_string[NIL] = "NIL";
+  tok_to_string[OR] = "OR";
+  tok_to_string[PRINT] = "PRINT";
+  tok_to_string[RETURN] = "RETURN";
+  tok_to_string[SUPER] = "SUPER";
+  tok_to_string[THIS] = "THIS";
+  tok_to_string[TRUE] = "TRUE";
+  tok_to_string[VAR] = "VAR";
+  tok_to_string[WHILE] = "WHILE";
+  tok_to_string[EOF_TOK] = "EOF_TOK";
 }
 
 void Lexer::error(int line, string message) { report(line, "", message); }
@@ -206,8 +252,8 @@ void Lexer::consumeToken() {
 void Lexer::getTokens() {
   std::cout << "Start lexing..." << std::endl;
   while (!srcEnd()) {
-    start = current;
     consumeToken();
+    start = current;
   }
 
   addToken(EOF_TOK);
