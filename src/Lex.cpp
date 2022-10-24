@@ -15,7 +15,25 @@ string Token::show_val() { return lexeme + " " + literal; }
 // Lexer function definitions
 bool Lexer::err = false;
 
-Lexer::Lexer(string src) : src(src), start(0), current(0), line(1) {}
+Lexer::Lexer(string src) : src(src), start(0), current(0), line(1) {
+  // Keywords for lox
+  keywords["and"] = AND;
+  keywords["class"] = CLASS;
+  keywords["else"] = ELSE;
+  keywords["false"] = FALSE;
+  keywords["for"] = FOR;
+  keywords["fun"] = FUN;
+  keywords["if"] = IF;
+  keywords["nil"] = NIL;
+  keywords["or"] = OR;
+  keywords["print"] = PRINT;
+  keywords["return"] = RETURN;
+  keywords["super"] = SUPER;
+  keywords["this"] = THIS;
+  keywords["true"] = TRUE;
+  keywords["var"] = VAR;
+  keywords["while"] = WHILE;
+}
 
 void Lexer::error(int line, string message) { report(line, "", message); }
 
@@ -26,6 +44,12 @@ void Lexer::report(int line, string where, string message) {
 }
 
 bool Lexer::isDigit(char c) { return c <= '9' && c >= '0'; }
+
+bool Lexer::isAlpha(char c) {
+  return (c <= 'z' && c >= 'a') || (c <= 'Z' && c >= 'A') || (c == '_');
+}
+
+bool Lexer::isAlphaNumeric(char c) { return isAlpha(c) || isDigit(c); }
 
 inline char Lexer::consume() { return src[current++]; }
 
@@ -82,6 +106,10 @@ void Lexer::scanNum() {
   }
 }
 
+void Lexer::scanIdentifier() {
+  while (isAlphaNumeric(lookahead(0))) consume();
+}
+
 void Lexer::consumeToken() {
   char c = consume();
 
@@ -122,16 +150,6 @@ void Lexer::consumeToken() {
     case '\n':
       line++;
       break;
-    default:
-      // Check if it's a digit
-      if (isDigit(c)) {
-        scanNum();
-        addToken(NUMBER, src.substr(start, current - start));
-      } else {
-        error(line, string("Unexpected character: ") + c);
-        err = true;
-      }
-      break;
 
     // 2 char tokens
     case '!':
@@ -159,6 +177,29 @@ void Lexer::consumeToken() {
     case '"':
       scanString();
       addToken(STRING, src.substr(start + 1, current - start - 2));
+
+    // Special cases
+    default:
+      // Check if it's a digit
+      if (isDigit(c)) {
+        scanNum();
+        addToken(NUMBER, src.substr(start, current - start));
+        // Check if it's a identifier
+      } else if (isAlpha(c)) {
+        scanIdentifier();
+
+        // Check if it's a keyword
+        string identifierText = src.substr(start, current - start);
+        TokenType tokType = (keywords.find(identifierText) == keywords.end())
+                                ? IDENTIFIER
+                                : keywords[identifierText];
+        addToken(tokType, identifierText);
+        // Error
+      } else {
+        error(line, string("Unexpected character: ") + c);
+        err = true;
+      }
+      break;
   }
 }
 

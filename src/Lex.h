@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 typedef std::string string;
 
@@ -74,7 +75,11 @@ class Lexer {
 
   Lexer(string src);
 
-  bool isDigit (char c);
+  bool isDigit(char c);
+
+  bool isAlpha(char c);
+
+  bool isAlphaNumeric(char c);
 
   void getTokens();
 
@@ -92,6 +97,8 @@ class Lexer {
 
   void scanNum();
 
+  void scanIdentifier();
+
   void addToken(TokenType type);
 
   void addToken(TokenType type, string literal);
@@ -104,6 +111,7 @@ class Lexer {
   string src;
   uint start, current, line;
   std::vector<Token> tokens;
+  std::map<string, TokenType> keywords;
 };
 
 #endif
