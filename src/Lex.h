@@ -74,17 +74,23 @@ class Lexer {
 
   Lexer(string src);
 
+  bool isDigit (char c);
+
   void getTokens();
 
   inline char consume();
 
   inline bool srcEnd();
 
-  inline char lookahead();
+  inline char lookahead(int offset);
 
   bool match(char expect);
 
   void consumeToken();
+
+  void scanString();
+
+  void scanNum();
 
   void addToken(TokenType type);
 

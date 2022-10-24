@@ -25,11 +25,16 @@ void Lexer::report(int line, string where, string message) {
   err = true;
 }
 
+bool Lexer::isDigit(char c) { return c <= '9' && c >= '0'; }
+
 inline char Lexer::consume() { return src[current++]; }
 
 inline bool Lexer::srcEnd() { return current >= src.size(); }
 
-inline char Lexer::lookahead() { return (srcEnd() ? '\0' : src[current]); }
+inline char Lexer::lookahead(int offset) {
+  if (current + offset >= src.size()) return '\0';
+  return src[current + offset];
+}
 
 bool Lexer::match(char expect) {
   if (srcEnd()) return false;
@@ -46,6 +51,35 @@ void Lexer::addToken(TokenType type) { addToken(type, ""); }
 
 void Lexer::addToken(TokenType type, string literal) {
   tokens.push_back(Token(type, src.substr(start, current - start), literal));
+}
+
+void Lexer::scanString() {
+  // Consume chars until reach last '"'
+  while (lookahead(0) != '"' && !srcEnd()) {
+    if (lookahead(0) == '\n') line++;
+
+    consume();
+  }
+
+  // If reach end, fail
+  if (srcEnd()) {
+    error(line, "Expect end of string");
+    exit(1);
+  }
+
+  // Consume last '"'
+  consume();
+}
+
+void Lexer::scanNum() {
+  while (isDigit(lookahead(0))) consume();
+
+  if (lookahead(0) == '.' && isDigit(lookahead(1))) {
+    // Consume '.'
+    consume();
+
+    while (isDigit(lookahead(0))) consume();
+  }
 }
 
 void Lexer::consumeToken() {
@@ -83,12 +117,20 @@ void Lexer::consumeToken() {
     case '*':
       addToken(STAR);
       break;
+    case ' ':
+      break;
     case '\n':
       line++;
       break;
     default:
-      error(line, string("Unexpected character: ") + c);
-      err = true;
+      // Check if it's a digit
+      if (isDigit(c)) {
+        scanNum();
+        addToken(NUMBER, src.substr(start, current - start));
+      } else {
+        error(line, string("Unexpected character: ") + c);
+        err = true;
+      }
       break;
 
     // 2 char tokens
@@ -108,10 +150,15 @@ void Lexer::consumeToken() {
     // Slashes
     case '/':
       if (match('/'))
-        while (lookahead() != '\n' && !srcEnd()) consume();
+        while (lookahead(0) != '\n' && !srcEnd()) consume();
       else
         addToken(SLASH);
       break;
+
+    // String literal
+    case '"':
+      scanString();
+      addToken(STRING, src.substr(start + 1, current - start - 2));
   }
 }
 
@@ -125,6 +172,6 @@ void Lexer::getTokens() {
   addToken(EOF_TOK);
 
   for (auto& t : tokens) {
-    std::cout << t.lexeme << std::endl;
+    std::cout << t.show_val() << std::endl;
   }
 }
