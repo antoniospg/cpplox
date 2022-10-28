@@ -78,11 +78,11 @@ class CppBuilder:
         self.add_ws(2)
         # Check if it's base class or not
         if parent == "":
-            self.append_src("void accept (" + name + "AstVisitor<T>" + " visitor);")
+            self.append_src("void accept (" + name + "AstVisitor<T>*" + " visitor);")
         else:
-            self.append_src("void accept (" + parent + "AstVisitor<T>" + " visitor) {")
+            self.append_src("void accept (" + parent + "AstVisitor<T>*" + " visitor) {")
             self.add_ws(4)
-            self.append_src("visitor.visit" + name + "(this);")
+            self.append_src("visitor->visit"  + parent + name + "(this);")
             self.add_ws(2)
             self.append_src("}")
 

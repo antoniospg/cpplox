@@ -23,7 +23,7 @@ class Expr {
   public:
   Expr( )  {}
   template <typename T>
-  void accept (ExprAstVisitor<T> visitor);
+  void accept (ExprAstVisitor<T>* visitor);
 };
 
 class Binary : Expr {
@@ -33,8 +33,8 @@ class Binary : Expr {
   Expr* right;
   Binary( Expr* left, Token op, Expr* right) : left(left), op(op), right(right) {}
   template <typename T>
-  void accept (ExprAstVisitor<T> visitor) {
-    visitor.visitBinary(this);
+  void accept (ExprAstVisitor<T>* visitor) {
+    visitor->visitExprBinary(this);
   }
 };
 
@@ -43,8 +43,8 @@ class Grouping : Expr {
   Expr* grouping;
   Grouping( Expr* grouping) : grouping(grouping) {}
   template <typename T>
-  void accept (ExprAstVisitor<T> visitor) {
-    visitor.visitGrouping(this);
+  void accept (ExprAstVisitor<T>* visitor) {
+    visitor->visitExprGrouping(this);
   }
 };
 
@@ -53,8 +53,8 @@ class Literal : Expr {
   string value;
   Literal( string value) : value(value) {}
   template <typename T>
-  void accept (ExprAstVisitor<T> visitor) {
-    visitor.visitLiteral(this);
+  void accept (ExprAstVisitor<T>* visitor) {
+    visitor->visitExprLiteral(this);
   }
 };
 
@@ -64,8 +64,8 @@ class Unary : Expr {
   Expr* right;
   Unary( Token op, Expr* right) : op(op), right(right) {}
   template <typename T>
-  void accept (ExprAstVisitor<T> visitor) {
-    visitor.visitUnary(this);
+  void accept (ExprAstVisitor<T>* visitor) {
+    visitor->visitExprUnary(this);
   }
 };
 #endif
