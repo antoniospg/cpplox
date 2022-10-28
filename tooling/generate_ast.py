@@ -3,19 +3,19 @@ from cpp_builder import CppBuilder
 
 ast_types = [
     ("Binary", [
-        ("Expr", "left"),
+        ("Expr*", "left"),
         ("Token", "op"),
-        ("Expr", "right")
+        ("Expr*", "right")
     ]),
     ("Grouping", [
-        ("Expr", "grouping")
+        ("Expr*", "grouping")
     ]),
     ("Literal", [
         ("string", "value")
     ]),
     ("Unary", [
         ("Token", "op"),
-        ("Expr", "right")
+        ("Expr*", "right")
     ])
 ]
 
@@ -24,6 +24,7 @@ file_path = sys.argv[1]
 base_name = "Expr"
 builder = CppBuilder(file_path + "/" + "Expr.hpp", "EXPR_HPP")
 builder.build_include("<string>")
+builder.build_include("<memory>")
 builder.build_include("\"../Lex.h\"")
 builder.build_using_namespace("std")
 

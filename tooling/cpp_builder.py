@@ -6,6 +6,7 @@ class CppBuilder:
         self.src = ""
         self.guard = guard
 
+        # Add header guard
         self.append_src("#ifndef " + self.guard)
         self.append_src("#define " + self.guard)
 
@@ -41,10 +42,11 @@ class CppBuilder:
         else:
             self.append_src("class " + name + " : " + parent + " {")
 
+        # Public fields
         self.add_ws(1)
         self.append_src(" public:")
 
-        # Gen attributes
+        # Gen class attributes
         for field_type, field_name in fields:
             self.add_ws(2)
             self.append_src(field_type + " " + field_name + ";")
@@ -70,9 +72,11 @@ class CppBuilder:
         constructor = constructor + " {}"
         self.append_src(constructor)
 
+        # Visitor fields
         self.add_ws(2)
         self.build_template_header("T")
         self.add_ws(2)
+        # Check if it's base class or not
         if parent == "":
             self.append_src("void accept (" + name + "AstVisitor<T>" + " visitor);")
         else:
