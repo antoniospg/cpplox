@@ -13,10 +13,10 @@ class Expr;
 
 template <typename T>
 class ExprAstVisitor {
-  T visitExprBinary (Binary expr);
-  T visitExprGrouping (Grouping expr);
-  T visitExprLiteral (Literal expr);
-  T visitExprUnary (Unary expr);
+  T visitExprBinary (Binary* expr);
+  T visitExprGrouping (Grouping* expr);
+  T visitExprLiteral (Literal* expr);
+  T visitExprUnary (Unary* expr);
 };
 
 class Expr {

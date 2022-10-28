@@ -95,7 +95,7 @@ class CppBuilder:
         for type_name, _ in ast_types:
             self.add_ws(2)
             new_str = "T visit" + base_name + type_name + " (" + type_name + \
-                " " + base_name.lower() + ");"
+                "* " + base_name.lower() + ");"
             self.append_src(new_str)
         self.append_src("};")
 
