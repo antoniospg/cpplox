@@ -3,9 +3,18 @@ PROJ_NAME=cpplox
  
 # .c files
 CPP_src=$(wildcard ./src/*.cpp)
+
+# .py src files
+PY_src=$(wildcard ./tooling/*.py)
+
+# .py generate files
+PY_gen=$(wildcard ./tooling/generate_*.py)
  
 # .h files
 H_src=$(wildcard ./src/*.h)
+
+# .hpp generated files
+HPP_GEN=$(wildcard ./src/gen/*.hpp)
  
 # Object files
 OBJ=$(subst .cpp,.o,$(subst src,objects,$(CPP_src)))
@@ -20,14 +29,44 @@ CC_FLAGS=-c         \
          -ansi      \
          -pedantic \
 				 -std=c++17
- 
+
+# Python linter
+PYLINT=pylint
+
+# Flags for pylint
+PYLINT_FLAGS= -d=R,C
+
+# Python interpreter
+PYTHON= python3
+
+# PATH of generated .hpp
+GEN_PATH= ./src/gen
+
 # Command used at clean target
 RM = rm -rf
+
+#
+# Lint python code
+#
+pylint: $(PY_src) 
+	@ echo 'Linting python file: $^' 
+	$(PYLINT) $(PYLINT_FLAGS) $^ 
+	@ echo 'Finished linting python file: $^'
+	@ echo ' '
+
+#
+# Generate headers
+#
+sync: $(PY_gen)
+	@ echo 'Generate .hpp files with: $^' 
+	$(PYTHON) $^ $(GEN_PATH) 
+	@ echo 'Finished generating .hpp files for: $^'
+	@ echo ' '
  
 #
 # Compilation and linking
 #
-all: objFolder $(PROJ_NAME)
+all: objFolder $(PROJ_NAME) 
  
 $(PROJ_NAME): $(OBJ)
 	@ echo 'Building binary using GCC linker: $@'
@@ -40,7 +79,7 @@ $(PROJ_NAME): $(OBJ)
 	$(CC) $< $(CC_FLAGS) -o $@ 
 	@ echo ' '
  
-./objects/main.o: ./src/main.cpp $(H_src)
+./objects/main.o: ./src/main.cpp $(H_src) $(HPP_GEN)
 	@ echo 'Building target using GCC compiler: $<'
 	$(CC) $< $(CC_FLAGS) -o $@
 	@ echo ' '

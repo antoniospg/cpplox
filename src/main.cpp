@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Lex.h"
+#include "gen/Expr.hpp"
 
 typedef std::string string;
 
