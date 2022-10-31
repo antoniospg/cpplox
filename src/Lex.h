@@ -64,7 +64,7 @@ class Token {
   string lexeme;
   string literal;
 
-  Token(TokenType type, string lexeme, string literal);
+  Token(TokenType type, string lexeme, string literal, int line);
 
   string show_val();
 };

@@ -3,19 +3,19 @@ from cpp_builder import CppBuilder
 
 ast_types = [
     ("Binary", [
-        ("Expr*", "left"),
+        ("Expr<T>*", "left"),
         ("Token", "op"),
-        ("Expr*", "right")
+        ("Expr<T>*", "right")
     ]),
     ("Grouping", [
-        ("Expr*", "grouping")
+        ("Expr<T>*", "grouping")
     ]),
     ("Literal", [
         ("string", "value")
     ]),
     ("Unary", [
         ("Token", "op"),
-        ("Expr*", "right")
+        ("Expr<T>*", "right")
     ])
 ]
 
@@ -32,7 +32,6 @@ builder.build_nl()
 builder.build_forward(ast_types)
 builder.build_forward([("Expr", [])])
 
-builder.build_nl()
 builder.build_visitor("Expr", ast_types)
 
 builder.build_nl()

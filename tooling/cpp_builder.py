@@ -33,14 +33,17 @@ class CppBuilder:
 
     def build_forward(self, types):
         for type_name, _ in types:
+            self.build_template_header("T")
             self.append_src("class " + type_name + ";")
+            self.append_src("")
 
     def build_class(self, name, parent, fields):
         # Class header
+        self.build_template_header("T")
         if (parent == ""):
             self.append_src("class " + name + " {")
         else:
-            self.append_src("class " + name + " : " + parent + " {")
+            self.append_src("class " + name + " : public " + parent + "<T> {")
 
         # Public fields
         self.add_ws(1)
@@ -72,17 +75,15 @@ class CppBuilder:
         constructor = constructor + " {}"
         self.append_src(constructor)
 
-        # Visitor fields
-        self.add_ws(2)
-        self.build_template_header("T")
+        # Visitor methods
         self.add_ws(2)
         # Check if it's base class or not
         if parent == "":
-            self.append_src("void accept (" + name + "AstVisitor<T>*" + " visitor);")
+            self.append_src("virtual T accept (" + name + "AstVisitor<T>*" + " visitor) = 0;")
         else:
-            self.append_src("void accept (" + parent + "AstVisitor<T>*" + " visitor) {")
+            self.append_src("T accept (" + parent + "AstVisitor<T>*" + " visitor) {")
             self.add_ws(4)
-            self.append_src("visitor->visit"  + parent + name + "(this);")
+            self.append_src("return visitor->visit"  + parent + name + "(this);")
             self.add_ws(2)
             self.append_src("}")
 
@@ -91,11 +92,15 @@ class CppBuilder:
     def build_visitor(self, base_name, ast_types):
         self.build_template_header("T")
 
+        # Header
         self.append_src("class " + base_name + "AstVisitor {")
+        self.append_src("public:")
+
+        # Methods
         for type_name, _ in ast_types:
             self.add_ws(2)
-            new_str = "T visit" + base_name + type_name + " (" + type_name + \
-                "* " + base_name.lower() + ");"
+            new_str = "virtual T visit" + base_name + type_name + " (" + type_name + \
+                "<T>* " + base_name.lower() + ") = 0;"
             self.append_src(new_str)
         self.append_src("};")
 

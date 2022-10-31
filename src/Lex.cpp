@@ -8,8 +8,8 @@ std::map<TokenType, string> tok_to_string;
 
 // ----------------------------------------
 // Token function definitions
-Token::Token(TokenType type, string lexeme, string literal)
-    : type(type), lexeme(lexeme), literal(literal) {}
+Token::Token(TokenType type, string lexeme, string literal, int line)
+    : type(type), lexeme(lexeme), literal(literal), line(line) {}
 
 string Token::show_val() {
   return string("type: '" + tok_to_string[type] + "' lexeme: '" + lexeme +
@@ -120,7 +120,8 @@ bool Lexer::match(char expect) {
 void Lexer::addToken(TokenType type) { addToken(type, ""); }
 
 void Lexer::addToken(TokenType type, string literal) {
-  tokens.push_back(Token(type, src.substr(start, current - start), literal));
+  tokens.push_back(
+      Token(type, src.substr(start, current - start), literal, line));
 }
 
 void Lexer::scanString() {

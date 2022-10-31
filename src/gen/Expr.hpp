@@ -5,67 +5,77 @@
 #include "../Lex.h"
 using namespace std;
 
+template <typename T>
 class Binary;
+
+template <typename T>
 class Grouping;
+
+template <typename T>
 class Literal;
+
+template <typename T>
 class Unary;
+
+template <typename T>
 class Expr;
 
 template <typename T>
 class ExprAstVisitor {
-  T visitExprBinary (Binary* expr);
-  T visitExprGrouping (Grouping* expr);
-  T visitExprLiteral (Literal* expr);
-  T visitExprUnary (Unary* expr);
+public:
+  virtual T visitExprBinary (Binary<T>* expr) = 0;
+  virtual T visitExprGrouping (Grouping<T>* expr) = 0;
+  virtual T visitExprLiteral (Literal<T>* expr) = 0;
+  virtual T visitExprUnary (Unary<T>* expr) = 0;
 };
 
+template <typename T>
 class Expr {
   public:
   Expr( )  {}
-  template <typename T>
-  void accept (ExprAstVisitor<T>* visitor);
+  virtual T accept (ExprAstVisitor<T>* visitor) = 0;
 };
 
-class Binary : Expr {
+template <typename T>
+class Binary : public Expr<T> {
   public:
-  Expr* left;
+  Expr<T>* left;
   Token op;
-  Expr* right;
-  Binary( Expr* left, Token op, Expr* right) : left(left), op(op), right(right) {}
-  template <typename T>
-  void accept (ExprAstVisitor<T>* visitor) {
-    visitor->visitExprBinary(this);
+  Expr<T>* right;
+  Binary( Expr<T>* left, Token op, Expr<T>* right) : left(left), op(op), right(right) {}
+  T accept (ExprAstVisitor<T>* visitor) {
+    return visitor->visitExprBinary(this);
   }
 };
 
-class Grouping : Expr {
+template <typename T>
+class Grouping : public Expr<T> {
   public:
-  Expr* grouping;
-  Grouping( Expr* grouping) : grouping(grouping) {}
-  template <typename T>
-  void accept (ExprAstVisitor<T>* visitor) {
-    visitor->visitExprGrouping(this);
+  Expr<T>* grouping;
+  Grouping( Expr<T>* grouping) : grouping(grouping) {}
+  T accept (ExprAstVisitor<T>* visitor) {
+    return visitor->visitExprGrouping(this);
   }
 };
 
-class Literal : Expr {
+template <typename T>
+class Literal : public Expr<T> {
   public:
   string value;
   Literal( string value) : value(value) {}
-  template <typename T>
-  void accept (ExprAstVisitor<T>* visitor) {
-    visitor->visitExprLiteral(this);
+  T accept (ExprAstVisitor<T>* visitor) {
+    return visitor->visitExprLiteral(this);
   }
 };
 
-class Unary : Expr {
+template <typename T>
+class Unary : public Expr<T> {
   public:
   Token op;
-  Expr* right;
-  Unary( Token op, Expr* right) : op(op), right(right) {}
-  template <typename T>
-  void accept (ExprAstVisitor<T>* visitor) {
-    visitor->visitExprUnary(this);
+  Expr<T>* right;
+  Unary( Token op, Expr<T>* right) : op(op), right(right) {}
+  T accept (ExprAstVisitor<T>* visitor) {
+    return visitor->visitExprUnary(this);
   }
 };
 #endif
