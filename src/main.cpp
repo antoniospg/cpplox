@@ -6,7 +6,9 @@
 #include <vector>
 
 #include "Lex.h"
+#include "Parser.h"
 #include "gen/Expr.hpp"
+#include "AstPrinter.h"
 
 typedef std::string string;
 
@@ -27,8 +29,14 @@ static string readAllBytes(char const* filename) {
 bool run(string src) {
   Lexer* scan = new Lexer(src);
   scan->getTokens();
-  bool err =  scan->err;
+  bool err = scan->err;
   scan->err = false;
+
+  Parser<string>* parser = new Parser<string>(scan->tokens);
+  auto expr = parser->expression();
+  AstPrinter* pp = new AstPrinter();
+  auto seq = pp->print(expr);
+  cout << seq << endl;
 
   return err;
 }
@@ -45,7 +53,6 @@ int repl() {
     }
 
     run(line);
-    std::cout << "endl line" << std::endl;
   }
 
   return 0;

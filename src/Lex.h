@@ -71,6 +71,8 @@ class Token {
 
 class Lexer {
  public:
+  std::vector<Token> tokens;
+
   static bool err;
 
   Lexer(string src);
@@ -110,7 +112,6 @@ class Lexer {
  private:
   string src;
   uint start, current, line;
-  std::vector<Token> tokens;
   std::map<string, TokenType> keywords;
 };
 

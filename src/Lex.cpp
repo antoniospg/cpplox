@@ -251,15 +251,10 @@ void Lexer::consumeToken() {
 }
 
 void Lexer::getTokens() {
-  std::cout << "Start lexing..." << std::endl;
   while (!srcEnd()) {
     consumeToken();
     start = current;
   }
 
   addToken(EOF_TOK);
-
-  for (auto& t : tokens) {
-    std::cout << t.show_val() << std::endl;
-  }
 }
