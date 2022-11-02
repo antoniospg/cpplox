@@ -105,9 +105,12 @@ class Lexer {
 
   void addToken(TokenType type, string literal);
 
-  void error(int line, string message);
+  static void error(int line, string message);
 
-  void report(int line, string where, string message);
+  static void error(Token token, string message);
+
+  static void report(int line, string where, string message);
+
 
  private:
   string src;

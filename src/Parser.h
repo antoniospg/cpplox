@@ -1,6 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -9,9 +10,16 @@
 
 using namespace std;
 
+class ParserError : runtime_error {
+ public:
+  ParserError() : runtime_error("") {}
+};
+
 template <typename T>
 class Parser {
  public:
+  static bool err;
+
   Parser(vector<Token> tokens);
 
   bool isEnd();
@@ -28,6 +36,11 @@ class Parser {
 
   bool match(vector<TokenType> types);
 
+  ParserError error(Token token, string message);
+
+  void synchronize();
+
+  Expr<T>* parse();
   Expr<T>* expression();
   Expr<T>* equality();
   Expr<T>* comparison();

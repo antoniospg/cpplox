@@ -5,10 +5,10 @@
 #include <string>
 #include <vector>
 
+#include "AstPrinter.h"
 #include "Lex.h"
 #include "Parser.h"
 #include "gen/Expr.hpp"
-#include "AstPrinter.h"
 
 typedef std::string string;
 
@@ -27,13 +27,20 @@ static string readAllBytes(char const* filename) {
 }
 
 bool run(string src) {
+  bool err = false;
+
   Lexer* scan = new Lexer(src);
   scan->getTokens();
-  bool err = scan->err;
+  err = scan->err;
   scan->err = false;
+  if (err) return true;
 
   Parser<string>* parser = new Parser<string>(scan->tokens);
-  auto expr = parser->expression();
+  auto expr = parser->parse();
+  err = parser->err;
+  parser->err = false;
+  if (err) return true;
+
   AstPrinter* pp = new AstPrinter();
   auto seq = pp->print(expr);
   cout << seq << endl;

@@ -83,6 +83,13 @@ Lexer::Lexer(string src) : src(src), start(0), current(0), line(1) {
 
 void Lexer::error(int line, string message) { report(line, "", message); }
 
+void Lexer::error(Token token, string message) {
+  if (token.type == EOF_TOK)
+    report(token.line, " at end", message);
+  else
+    report(token.line, " at '" + token.lexeme + "'", message);
+}
+
 void Lexer::report(int line, string where, string message) {
   std::cout << "[line " << line << "] Error" << where << ": " << message
             << std::endl;

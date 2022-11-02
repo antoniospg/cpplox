@@ -9,6 +9,9 @@ using namespace std;
 
 // Aux functions
 template <typename T>
+bool Parser<T>::err = false;
+
+template <typename T>
 Parser<T>::Parser(vector<Token> tokens) : tokens(tokens), current(0) {}
 
 template <typename T>
@@ -36,8 +39,7 @@ template <typename T>
 Token Parser<T>::consume(TokenType type, string message) {
   if (check(type)) return consume();
 
-  cout << message << endl;
-  exit(1);
+  throw error(lookahead(), message);
 }
 
 template <typename T>
@@ -58,7 +60,45 @@ bool Parser<T>::match(vector<TokenType> types) {
   return false;
 }
 
+template <typename T>
+ParserError Parser<T>::error(Token token, string message) {
+  Lexer::error(token, message);
+  return ParserError();
+}
+
+template <typename T>
+void Parser<T>::synchronize() {
+  consume();
+
+  while (!isEnd()) {
+    if (getPrevious().type == SEMICOLON) return;
+
+    switch (lookahead().type) {
+      case CLASS:
+      case FUN:
+      case VAR:
+      case FOR:
+      case IF:
+      case WHILE:
+      case PRINT:
+      case RETURN:
+        return;
+    }
+
+    consume();
+  }
+}
+
 // Build AST
+template <typename T>
+Expr<T>* Parser<T>::parse() {
+  try {
+    return expression();
+  } catch (const ParserError& err) {
+    return nullptr;
+  }
+}
+
 template <typename T>
 Expr<T>* Parser<T>::expression() {
   return equality();
@@ -144,8 +184,11 @@ Expr<T>* Parser<T>::primary() {
 
     consume(RIGHT_PAREN, "Expected ')' after expression");
     return new Grouping<T>(expr);
-  } else
+  } else {
+    throw error(lookahead(), "Expected expression");
+    err = true;
     return nullptr;
+  }
 }
 
 template class Parser<string>;
