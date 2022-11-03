@@ -1,6 +1,7 @@
 #include "AstPrinter.h"
 
 #include <iostream>
+#include <variant>
 #include <vector>
 
 #include "Lex.h"
@@ -27,10 +28,10 @@ string AstPrinter::visitExprGrouping(Grouping<string>* expr) {
 }
 
 string AstPrinter::visitExprLiteral(Literal<string>* expr) {
-  if (expr->value == "")
+  if (holds_alternative<monostate>(expr->value))
     return "nil";
   else
-    return expr->value;
+    return to_string(expr->value);
 }
 
 string AstPrinter::visitExprUnary(Unary<string>* expr) {

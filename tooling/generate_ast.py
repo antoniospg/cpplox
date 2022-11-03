@@ -11,7 +11,7 @@ ast_types = [
         ("Expr<T>*", "grouping")
     ]),
     ("Literal", [
-        ("string", "value")
+        ("Obj", "value")
     ]),
     ("Unary", [
         ("Token", "op"),
@@ -26,6 +26,7 @@ builder = CppBuilder(file_path + "/" + "Expr.hpp", "EXPR_HPP")
 builder.build_include("<string>")
 builder.build_include("<memory>")
 builder.build_include("\"../Lex.h\"")
+builder.build_include("\"../Util.h\"")
 builder.build_using_namespace("std")
 
 builder.build_nl()

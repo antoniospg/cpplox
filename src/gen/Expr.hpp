@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include "../Lex.h"
+#include "../Util.h"
 using namespace std;
 
 template <typename T>
@@ -61,8 +62,8 @@ class Grouping : public Expr<T> {
 template <typename T>
 class Literal : public Expr<T> {
   public:
-  string value;
-  Literal( string value) : value(value) {}
+  Obj value;
+  Literal( Obj value) : value(value) {}
   T accept (ExprAstVisitor<T>* visitor) {
     return visitor->visitExprLiteral(this);
   }

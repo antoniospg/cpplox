@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "Util.h"
+
 typedef std::string string;
 
 enum TokenType {
@@ -62,9 +64,9 @@ class Token {
   int line;
   TokenType type;
   string lexeme;
-  string literal;
+  Obj literal;
 
-  Token(TokenType type, string lexeme, string literal, int line);
+  Token(TokenType type, string lexeme, Obj literal, int line);
 
   string show_val();
 };
@@ -110,7 +112,6 @@ class Lexer {
   static void error(Token token, string message);
 
   static void report(int line, string where, string message);
-
 
  private:
   string src;

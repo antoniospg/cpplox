@@ -2,18 +2,20 @@
 
 #include <iostream>
 
+#include "Util.h"
+
 typedef std::string string;
 
 std::map<TokenType, string> tok_to_string;
 
 // ----------------------------------------
 // Token function definitions
-Token::Token(TokenType type, string lexeme, string literal, int line)
+Token::Token(TokenType type, string lexeme, Obj literal, int line)
     : type(type), lexeme(lexeme), literal(literal), line(line) {}
 
 string Token::show_val() {
   return string("type: '" + tok_to_string[type] + "' lexeme: '" + lexeme +
-                "' literal: '" + literal + "'");
+                "' literal: '" + to_string(literal) + "'");
 }
 
 // ----------------------------------------
@@ -127,8 +129,23 @@ bool Lexer::match(char expect) {
 void Lexer::addToken(TokenType type) { addToken(type, ""); }
 
 void Lexer::addToken(TokenType type, string literal) {
+  // Convert string to Obj variant
+  // Default is monostate
+  Obj value;
+
+  switch (type) {
+    case STRING:
+      value = literal;
+      break;
+    case NUMBER:
+      value = stod(literal);
+      break;
+    default:
+      break;
+  }
+
   tokens.push_back(
-      Token(type, src.substr(start, current - start), literal, line));
+      Token(type, src.substr(start, current - start), value, line));
 }
 
 void Lexer::scanString() {
