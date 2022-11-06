@@ -10,7 +10,7 @@
 
 using namespace std;
 
-class ParserError : runtime_error {
+class ParserError : public runtime_error {
  public:
   ParserError() : runtime_error("") {}
 };

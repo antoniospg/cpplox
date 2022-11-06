@@ -30,24 +30,20 @@ static string readAllBytes(char const* filename) {
 bool run(string src) {
   bool err = false;
 
-  static Lexer* scan = new Lexer(src);
+  Lexer* scan = new Lexer(src);
   scan->getTokens();
   err &= scan->err;
   if (err) return true;
 
-  static Parser<Obj>* parser = new Parser<Obj>(scan->tokens);
+  Parser<Obj>* parser = new Parser<Obj>(scan->tokens);
   auto expr = parser->parse();
   err &= parser->err;
   if (err) return true;
 
-  static Interpreter* interpreter = new Interpreter();
+  Interpreter* interpreter = new Interpreter();
   interpreter->interpret(expr);
   err &= interpreter->err;
   if (err) return true;
-
-  scan->err = false;
-  parser->err = false;
-  interpreter->err = false;
 
   return err;
 }
@@ -55,7 +51,7 @@ bool run(string src) {
 int repl() {
   for (;;) {
     string line;
-    std::cout << "cpplox>";
+    std::cout << "cpplox> ";
     std::getline(std::cin, line);
 
     if (std::cin.eof()) {

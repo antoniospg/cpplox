@@ -236,6 +236,7 @@ void Lexer::consumeToken() {
     case '"':
       scanString();
       addToken(STRING, src.substr(start + 1, current - start - 2));
+      break;
 
     // Special cases
     default:

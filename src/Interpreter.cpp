@@ -114,12 +114,11 @@ void Interpreter::interpret(Expr<Obj>* expr) {
     Obj val = expr->accept(this);
     cout << to_string(val) << endl;
   } catch (const RuntimeError& err) {
-
+    runtimeError(err);
   }
 }
 
 void Interpreter::runtimeError(const RuntimeError& error) {
-  cout << error.what() << endl
-       << "[line " + to_string(error.token.line) + "]" << endl;
+  cout << "[line " + to_string(error.token.line) + "] " << error.what() << endl;
   err = true;
 }
