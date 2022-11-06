@@ -18,28 +18,18 @@ class ParserError : runtime_error {
 template <typename T>
 class Parser {
  public:
-  static bool err;
+  bool err;
 
   Parser(vector<Token> tokens);
-
   bool isEnd();
-
   Token lookahead();
-
   Token getPrevious();
-
   Token consume();
-
   Token consume(TokenType type, string message);
-
   bool check(TokenType val);
-
   bool match(vector<TokenType> types);
-
   ParserError error(Token token, string message);
-
   void synchronize();
-
   Expr<T>* parse();
   Expr<T>* expression();
   Expr<T>* equality();

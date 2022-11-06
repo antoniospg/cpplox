@@ -67,51 +67,30 @@ class Token {
   Obj literal;
 
   Token(TokenType type, string lexeme, Obj literal, int line);
-
   string show_val();
 };
 
 class Lexer {
  public:
   std::vector<Token> tokens;
-
-  static bool err;
+  bool err;
 
   Lexer(string src);
-
   bool isDigit(char c);
-
   bool isAlpha(char c);
-
   bool isAlphaNumeric(char c);
-
   void getTokens();
-
   inline char consume();
-
   inline bool srcEnd();
-
   inline char lookahead(int offset);
-
   bool match(char expect);
-
   void consumeToken();
-
   void scanString();
-
   void scanNum();
-
   void scanIdentifier();
-
   void addToken(TokenType type);
-
   void addToken(TokenType type, string literal);
-
-  static void error(int line, string message);
-
-  static void error(Token token, string message);
-
-  static void report(int line, string where, string message);
+  void error(int line, string message);
 
  private:
   string src;

@@ -8,6 +8,7 @@
 #include "AstPrinter.h"
 #include "Lex.h"
 #include "Parser.h"
+#include "Interpreter.h"
 #include "gen/Expr.hpp"
 
 typedef std::string string;
@@ -29,21 +30,24 @@ static string readAllBytes(char const* filename) {
 bool run(string src) {
   bool err = false;
 
-  Lexer* scan = new Lexer(src);
+  static Lexer* scan = new Lexer(src);
   scan->getTokens();
-  err = scan->err;
-  scan->err = false;
+  err &= scan->err;
   if (err) return true;
 
-  Parser<string>* parser = new Parser<string>(scan->tokens);
+  static Parser<Obj>* parser = new Parser<Obj>(scan->tokens);
   auto expr = parser->parse();
-  err = parser->err;
-  parser->err = false;
+  err &= parser->err;
   if (err) return true;
 
-  AstPrinter* pp = new AstPrinter();
-  auto seq = pp->print(expr);
-  cout << seq << endl;
+  static Interpreter* interpreter = new Interpreter();
+  interpreter->interpret(expr);
+  err &= interpreter->err;
+  if (err) return true;
+
+  scan->err = false;
+  parser->err = false;
+  interpreter->err = false;
 
   return err;
 }

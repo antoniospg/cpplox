@@ -20,9 +20,7 @@ string Token::show_val() {
 
 // ----------------------------------------
 // Lexer function definitions
-bool Lexer::err = false;
-
-Lexer::Lexer(string src) : src(src), start(0), current(0), line(1) {
+Lexer::Lexer(string src) : err(false), src(src), start(0), current(0), line(1) {
   // Keywords for lox
   keywords["and"] = AND;
   keywords["class"] = CLASS;
@@ -83,19 +81,9 @@ Lexer::Lexer(string src) : src(src), start(0), current(0), line(1) {
   tok_to_string[EOF_TOK] = "EOF_TOK";
 }
 
-void Lexer::error(int line, string message) { report(line, "", message); }
-
-void Lexer::error(Token token, string message) {
-  if (token.type == EOF_TOK)
-    report(token.line, " at end", message);
-  else
-    report(token.line, " at '" + token.lexeme + "'", message);
-}
-
-void Lexer::report(int line, string where, string message) {
-  std::cout << "[line " << line << "] Error" << where << ": " << message
-            << std::endl;
+void Lexer::error(int line, string message) {
   err = true;
+  report(line, "", message);
 }
 
 bool Lexer::isDigit(char c) { return c <= '9' && c >= '0'; }

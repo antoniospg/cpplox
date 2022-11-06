@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include "Util.h"
 
 #include <iostream>
 #include <vector>
@@ -9,10 +10,8 @@ using namespace std;
 
 // Aux functions
 template <typename T>
-bool Parser<T>::err = false;
-
-template <typename T>
-Parser<T>::Parser(vector<Token> tokens) : tokens(tokens), current(0) {}
+Parser<T>::Parser(vector<Token> tokens)
+    : err(false), tokens(tokens), current(0) {}
 
 template <typename T>
 bool Parser<T>::isEnd() {
@@ -62,7 +61,11 @@ bool Parser<T>::match(vector<TokenType> types) {
 
 template <typename T>
 ParserError Parser<T>::error(Token token, string message) {
-  Lexer::error(token, message);
+  err = true;
+  if (token.type == EOF_TOK)
+    report(token.line, " at end", message);
+  else
+    report(token.line, " at '" + token.lexeme + "'", message);
   return ParserError();
 }
 
@@ -192,3 +195,4 @@ Expr<T>* Parser<T>::primary() {
 }
 
 template class Parser<string>;
+template class Parser<Obj>;
