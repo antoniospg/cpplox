@@ -94,11 +94,14 @@ void Parser<T>::synchronize() {
 
 // Build AST
 template <typename T>
-Expr<T>* Parser<T>::parse() {
+vector<Stmt<T>*> Parser<T>::parse() {
   try {
-    return expression();
+    vector<Stmt<T>*> statements;
+    while (!isEnd()) statements.push_back(statement());
+
+    return statements;
   } catch (const ParserError& err) {
-    return nullptr;
+    return vector<Stmt<T>*>();
   }
 }
 
@@ -192,6 +195,29 @@ Expr<T>* Parser<T>::primary() {
     err = true;
     return nullptr;
   }
+}
+
+template <typename T>
+Stmt<T>* Parser<T>::statement() {
+  if (match({PRINT})) return printStatement();
+
+  return expressionStatement();
+}
+
+template <typename T>
+Stmt<T>* Parser<T>::printStatement() {
+  Expr<T>* value = expression();
+  consume(SEMICOLON, "Expected ';' after expression");
+
+  return new Print<T>(value);
+}
+
+template <typename T>
+Stmt<T>* Parser<T>::expressionStatement() {
+  Expr<T>* value = expression();
+  consume(SEMICOLON, "Expected ';' after value");
+
+  return new Expression<T>(value);
 }
 
 template class Parser<string>;

@@ -79,6 +79,17 @@ Obj Interpreter::visitExprBinary(Binary<Obj>* expr) {
   return monostate();
 }
 
+Obj Interpreter::visitStmtExpression(Expression<Obj>* stmt) {
+  evaluate(reinterpret_cast<Expr<Obj>*>(stmt->expr));
+  return monostate();
+}
+
+Obj Interpreter::visitStmtPrint(Print<Obj>* stmt) {
+  auto value = evaluate(reinterpret_cast<Expr<Obj>*>(stmt->expr));
+  cout << to_string(value) << endl;
+  return monostate();
+}
+
 Obj Interpreter::evaluate(Expr<Obj>* expr) { return expr->accept(this); }
 
 bool Interpreter::isTrue(Obj value) {
@@ -109,10 +120,11 @@ bool Interpreter::isEqual(Obj v1, Obj v2) {
     return v1 == v2;
 }
 
-void Interpreter::interpret(Expr<Obj>* expr) {
+void Interpreter::execute(Stmt<Obj>* stmt) { stmt->accept(this); }
+
+void Interpreter::interpret(vector<Stmt<Obj>*> statements) {
   try {
-    Obj val = expr->accept(this);
-    cout << to_string(val) << endl;
+    for (auto& statement : statements) execute(statement);
   } catch (const RuntimeError& err) {
     runtimeError(err);
   }

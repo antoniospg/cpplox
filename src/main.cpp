@@ -6,9 +6,9 @@
 #include <vector>
 
 #include "AstPrinter.h"
+#include "Interpreter.h"
 #include "Lex.h"
 #include "Parser.h"
-#include "Interpreter.h"
 #include "gen/Expr.hpp"
 
 typedef std::string string;
@@ -36,12 +36,12 @@ bool run(string src) {
   if (err) return true;
 
   Parser<Obj>* parser = new Parser<Obj>(scan->tokens);
-  auto expr = parser->parse();
+  auto statements = parser->parse();
   err &= parser->err;
   if (err) return true;
 
   Interpreter* interpreter = new Interpreter();
-  interpreter->interpret(expr);
+  interpreter->interpret(statements);
   err &= interpreter->err;
   if (err) return true;
 

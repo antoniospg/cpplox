@@ -7,6 +7,7 @@
 
 #include "Lex.h"
 #include "gen/Expr.hpp"
+#include "gen/Stmt.hpp"
 
 using namespace std;
 
@@ -30,7 +31,7 @@ class Parser {
   bool match(vector<TokenType> types);
   ParserError error(Token token, string message);
   void synchronize();
-  Expr<T>* parse();
+  vector<Stmt<T>*> parse();
   Expr<T>* expression();
   Expr<T>* equality();
   Expr<T>* comparison();
@@ -38,6 +39,9 @@ class Parser {
   Expr<T>* factor();
   Expr<T>* unary();
   Expr<T>* primary();
+  Stmt<T>* statement();
+  Stmt<T>* printStatement();
+  Stmt<T>* expressionStatement();
 
  private:
   vector<Token> tokens;
