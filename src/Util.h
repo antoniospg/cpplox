@@ -9,7 +9,7 @@ using namespace std;
 // Varinant to encode possible object values
 typedef variant<monostate, string, double, bool> Obj;
 
-string to_string(const Obj& val);
+string to_string(const Obj &val);
 void report(int line, string where, string message);
 
 #endif

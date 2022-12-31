@@ -19,6 +19,9 @@ template <typename T>
 class Unary;
 
 template <typename T>
+class Variable;
+
+template <typename T>
 class Expr;
 
 template <typename T>
@@ -28,6 +31,7 @@ public:
   virtual T visitExprGrouping (Grouping<T>* expr) = 0;
   virtual T visitExprLiteral (Literal<T>* expr) = 0;
   virtual T visitExprUnary (Unary<T>* expr) = 0;
+  virtual T visitExprVariable (Variable<T>* expr) = 0;
 };
 
 template <typename T>
@@ -77,6 +81,16 @@ class Unary : public Expr<T> {
   Unary( Token op, Expr<T>* right) : op(op), right(right) {}
   T accept (ExprAstVisitor<T>* visitor) {
     return visitor->visitExprUnary(this);
+  }
+};
+
+template <typename T>
+class Variable : public Expr<T> {
+  public:
+  Token name;
+  Variable( Token name) : name(name) {}
+  T accept (ExprAstVisitor<T>* visitor) {
+    return visitor->visitExprVariable(this);
   }
 };
 #endif

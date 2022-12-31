@@ -99,12 +99,14 @@ inline char Lexer::consume() { return src[current++]; }
 inline bool Lexer::srcEnd() { return current >= src.size(); }
 
 inline char Lexer::lookahead(int offset) {
-  if (current + offset >= src.size()) return '\0';
+  if (current + offset >= src.size())
+    return '\0';
   return src[current + offset];
 }
 
 bool Lexer::match(char expect) {
-  if (srcEnd()) return false;
+  if (srcEnd())
+    return false;
 
   if (src[current] == expect) {
     current++;
@@ -122,14 +124,14 @@ void Lexer::addToken(TokenType type, string literal) {
   Obj value;
 
   switch (type) {
-    case STRING:
-      value = literal;
-      break;
-    case NUMBER:
-      value = stod(literal);
-      break;
-    default:
-      break;
+  case STRING:
+    value = literal;
+    break;
+  case NUMBER:
+    value = stod(literal);
+    break;
+  default:
+    break;
   }
 
   tokens.push_back(
@@ -139,7 +141,8 @@ void Lexer::addToken(TokenType type, string literal) {
 void Lexer::scanString() {
   // Consume chars until reach last '"'
   while (lookahead(0) != '"' && !srcEnd()) {
-    if (lookahead(0) == '\n') line++;
+    if (lookahead(0) == '\n')
+      line++;
 
     consume();
   }
@@ -155,111 +158,115 @@ void Lexer::scanString() {
 }
 
 void Lexer::scanNum() {
-  while (isDigit(lookahead(0))) consume();
+  while (isDigit(lookahead(0)))
+    consume();
 
   if (lookahead(0) == '.' && isDigit(lookahead(1))) {
     // Consume '.'
     consume();
 
-    while (isDigit(lookahead(0))) consume();
+    while (isDigit(lookahead(0)))
+      consume();
   }
 }
 
 void Lexer::scanIdentifier() {
-  while (isAlphaNumeric(lookahead(0))) consume();
+  while (isAlphaNumeric(lookahead(0)))
+    consume();
 }
 
 void Lexer::consumeToken() {
   char c = consume();
 
   switch (c) {
-    // Single char tokens
-    case '(':
-      addToken(LEFT_PAREN);
-      break;
-    case ')':
-      addToken(RIGHT_PAREN);
-      break;
-    case '{':
-      addToken(LEFT_BRACE);
-      break;
-    case '}':
-      addToken(RIGHT_BRACE);
-      break;
-    case ',':
-      addToken(COMMA);
-      break;
-    case '.':
-      addToken(DOT);
-      break;
-    case '-':
-      addToken(MINUS);
-      break;
-    case '+':
-      addToken(PLUS);
-      break;
-    case ';':
-      addToken(SEMICOLON);
-      break;
-    case '*':
-      addToken(STAR);
-      break;
-    case ' ':
-      break;
-    case '\n':
-      line++;
-      break;
+  // Single char tokens
+  case '(':
+    addToken(LEFT_PAREN);
+    break;
+  case ')':
+    addToken(RIGHT_PAREN);
+    break;
+  case '{':
+    addToken(LEFT_BRACE);
+    break;
+  case '}':
+    addToken(RIGHT_BRACE);
+    break;
+  case ',':
+    addToken(COMMA);
+    break;
+  case '.':
+    addToken(DOT);
+    break;
+  case '-':
+    addToken(MINUS);
+    break;
+  case '+':
+    addToken(PLUS);
+    break;
+  case ';':
+    addToken(SEMICOLON);
+    break;
+  case '*':
+    addToken(STAR);
+    break;
+  case ' ':
+    break;
+  case '\n':
+    line++;
+    break;
 
-    // 2 char tokens
-    case '!':
-      addToken(match('=') ? BANG_EQUAL : BANG);
-      break;
-    case '=':
-      addToken(match('=') ? EQUAL_EQUAL : EQUAL);
-      break;
-    case '<':
-      addToken(match('=') ? LESS_EQUAL : LESS);
-      break;
-    case '>':
-      addToken(match('=') ? GREATER_EQUAL : GREATER);
-      break;
+  // 2 char tokens
+  case '!':
+    addToken(match('=') ? BANG_EQUAL : BANG);
+    break;
+  case '=':
+    addToken(match('=') ? EQUAL_EQUAL : EQUAL);
+    break;
+  case '<':
+    addToken(match('=') ? LESS_EQUAL : LESS);
+    break;
+  case '>':
+    addToken(match('=') ? GREATER_EQUAL : GREATER);
+    break;
 
-    // Slashes
-    case '/':
-      if (match('/'))
-        while (lookahead(0) != '\n' && !srcEnd()) consume();
-      else
-        addToken(SLASH);
-      break;
+  // Slashes
+  case '/':
+    if (match('/'))
+      while (lookahead(0) != '\n' && !srcEnd())
+        consume();
+    else
+      addToken(SLASH);
+    break;
 
-    // String literal
-    case '"':
-      scanString();
-      addToken(STRING, src.substr(start + 1, current - start - 2));
-      break;
+  // String literal
+  case '"':
+    scanString();
+    addToken(STRING, src.substr(start + 1, current - start - 2));
+    break;
 
-    // Special cases
-    default:
-      // Check if it's a digit
-      if (isDigit(c)) {
-        scanNum();
-        addToken(NUMBER, src.substr(start, current - start));
-        // Check if it's a identifier
-      } else if (isAlpha(c)) {
-        scanIdentifier();
+  // Special cases
+  default:
+    // Check if it's a digit
+    if (isDigit(c)) {
+      scanNum();
+      addToken(NUMBER, src.substr(start, current - start));
+      // Check if it's a identifier
+    } else if (isAlpha(c)) {
+      scanIdentifier();
 
-        // Check if it's a keyword
-        string identifierText = src.substr(start, current - start);
-        TokenType tokType = (keywords.find(identifierText) == keywords.end())
-                                ? IDENTIFIER
-                                : keywords[identifierText];
-        addToken(tokType, identifierText);
-        // Error
-      } else {
-        error(line, string("Unexpected character: ") + c);
-        err = true;
-      }
-      break;
+      // Check if it's a keyword
+      string identifierText = src.substr(start, current - start);
+      TokenType tokType = (keywords.find(identifierText) == keywords.end())
+                              ? IDENTIFIER
+                              : keywords[identifierText];
+      addToken(tokType, identifierText);
+      // Error
+    } else {
+      error(line, string("Unexpected character: ") + c);
+      err = true;
+    }
+    break;
   }
 }
 

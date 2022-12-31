@@ -4,7 +4,7 @@
 
 using namespace std;
 
-string to_string(const Obj& val) {
+string to_string(const Obj &val) {
   if (holds_alternative<string>(val))
     return get<string>(val);
   else if (holds_alternative<double>(val))

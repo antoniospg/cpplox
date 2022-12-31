@@ -13,9 +13,10 @@
 
 typedef std::string string;
 
-static string readAllBytes(char const* filename) {
+static string readAllBytes(char const *filename) {
   std::ifstream ifs(filename, std::ios::binary | std::ios::ate);
-  if (!ifs.good()) exit(66);
+  if (!ifs.good())
+    exit(66);
 
   std::ifstream::pos_type pos = ifs.tellg();
 
@@ -30,20 +31,23 @@ static string readAllBytes(char const* filename) {
 bool run(string src) {
   bool err = false;
 
-  Lexer* scan = new Lexer(src);
+  Lexer *scan = new Lexer(src);
   scan->getTokens();
   err &= scan->err;
-  if (err) return true;
+  if (err)
+    return true;
 
-  Parser<Obj>* parser = new Parser<Obj>(scan->tokens);
+  Parser<Obj> *parser = new Parser<Obj>(scan->tokens);
   auto statements = parser->parse();
   err &= parser->err;
-  if (err) return true;
+  if (err)
+    return true;
 
-  Interpreter* interpreter = new Interpreter();
+  Interpreter *interpreter = new Interpreter();
   interpreter->interpret(statements);
   err &= interpreter->err;
-  if (err) return true;
+  if (err)
+    return true;
 
   return err;
 }
@@ -65,16 +69,17 @@ int repl() {
   return 0;
 }
 
-int runFile(const string& path) {
+int runFile(const string &path) {
   string src = readAllBytes(path.data());
   bool err = run(src);
 
-  if (err) exit(65);
+  if (err)
+    exit(65);
 
   return 0;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   if (argc > 2) {
     std::cout << "Usage: cpplox [script]" << std::endl;
     exit(64);

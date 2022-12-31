@@ -60,7 +60,7 @@ enum TokenType {
 };
 
 class Token {
- public:
+public:
   int line;
   TokenType type;
   string lexeme;
@@ -71,7 +71,7 @@ class Token {
 };
 
 class Lexer {
- public:
+public:
   std::vector<Token> tokens;
   bool err;
 
@@ -92,7 +92,7 @@ class Lexer {
   void addToken(TokenType type, string literal);
   void error(int line, string message);
 
- private:
+private:
   string src;
   uint start, current, line;
   std::map<string, TokenType> keywords;

@@ -14,6 +14,9 @@ template <typename T>
 class Print;
 
 template <typename T>
+class Var;
+
+template <typename T>
 class Stmt;
 
 template <typename T>
@@ -21,6 +24,7 @@ class StmtAstVisitor {
 public:
   virtual T visitStmtExpression (Expression<T>* stmt) = 0;
   virtual T visitStmtPrint (Print<T>* stmt) = 0;
+  virtual T visitStmtVar (Var<T>* stmt) = 0;
 };
 
 template <typename T>
@@ -47,6 +51,17 @@ class Print : public Stmt<T> {
   Print( Expr<T>* expr) : expr(expr) {}
   T accept (StmtAstVisitor<T>* visitor) {
     return visitor->visitStmtPrint(this);
+  }
+};
+
+template <typename T>
+class Var : public Stmt<T> {
+  public:
+  Token name;
+  Expr<T>* initializer;
+  Var( Token name, Expr<T>* initializer) : name(name), initializer(initializer) {}
+  T accept (StmtAstVisitor<T>* visitor) {
+    return visitor->visitStmtVar(this);
   }
 };
 #endif

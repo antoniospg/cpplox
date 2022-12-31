@@ -12,13 +12,12 @@
 using namespace std;
 
 class ParserError : public runtime_error {
- public:
+public:
   ParserError() : runtime_error("") {}
 };
 
-template <typename T>
-class Parser {
- public:
+template <typename T> class Parser {
+public:
   bool err;
 
   Parser(vector<Token> tokens);
@@ -31,19 +30,21 @@ class Parser {
   bool match(vector<TokenType> types);
   ParserError error(Token token, string message);
   void synchronize();
-  vector<Stmt<T>*> parse();
-  Expr<T>* expression();
-  Expr<T>* equality();
-  Expr<T>* comparison();
-  Expr<T>* term();
-  Expr<T>* factor();
-  Expr<T>* unary();
-  Expr<T>* primary();
-  Stmt<T>* statement();
-  Stmt<T>* printStatement();
-  Stmt<T>* expressionStatement();
+  vector<Stmt<T> *> parse();
+  Expr<T> *expression();
+  Expr<T> *equality();
+  Expr<T> *comparison();
+  Expr<T> *term();
+  Expr<T> *factor();
+  Expr<T> *unary();
+  Expr<T> *primary();
+  Stmt<T> *declaration();
+  Stmt<T> *varDeclaration();
+  Stmt<T> *statement();
+  Stmt<T> *printStatement();
+  Stmt<T> *expressionStatement();
 
- private:
+private:
   vector<Token> tokens;
   int current;
 };
