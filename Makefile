@@ -67,6 +67,14 @@ sync: $(PY_gen)
 # Compilation and linking
 #
 all: objFolder $(PROJ_NAME) 
+
+#
+# Build compilation database
+#
+symbols: all
+	@ echo 'Building compilation database'
+	make clean
+	bear -- make all
  
 $(PROJ_NAME): $(OBJ)
 	@ echo 'Building binary using GCC linker: $@'
