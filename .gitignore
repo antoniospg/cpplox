@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Bloat
+tags
+compile_commands.json
+*.pyc
+.cache/**
