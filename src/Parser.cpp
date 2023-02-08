@@ -90,8 +90,11 @@ template <typename T> void Parser<T>::synchronize() {
 template <typename T> vector<Stmt<T> *> Parser<T>::parse() {
   try {
     vector<Stmt<T> *> statements;
-    while (!isEnd())
-      statements.push_back(declaration());
+    while (!isEnd()) {
+      auto stmt = declaration();
+      if (stmt != nullptr)
+        statements.push_back(stmt);
+    }
 
     return statements;
   } catch (const ParserError &err) {

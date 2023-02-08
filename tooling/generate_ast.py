@@ -16,6 +16,9 @@ expr_ast_types = [
     ("Unary", [
         ("Token", "op"),
         ("Expr<T>*", "right")
+    ]),
+    ("Variable", [
+        ("Token", "name")
     ])
 ]
 
@@ -25,6 +28,10 @@ stmt_ast_types = [
     ]),
     ("Print", [
         ("Expr<T>*", "expr")
+    ]),
+    ("Var", [
+        ("Token", "name"),
+        ("Expr<T>*", "initializer"),
     ])
 ]
 
