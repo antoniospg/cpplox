@@ -31,6 +31,7 @@ public:
   ParserError error(Token token, string message);
   void synchronize();
   vector<Stmt<T> *> parse();
+  Expr<T> *assignment();
   Expr<T> *expression();
   Expr<T> *equality();
   Expr<T> *comparison();

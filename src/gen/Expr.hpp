@@ -22,6 +22,9 @@ template <typename T>
 class Variable;
 
 template <typename T>
+class Assign;
+
+template <typename T>
 class Expr;
 
 template <typename T>
@@ -32,6 +35,7 @@ public:
   virtual T visitExprLiteral (Literal<T>* expr) = 0;
   virtual T visitExprUnary (Unary<T>* expr) = 0;
   virtual T visitExprVariable (Variable<T>* expr) = 0;
+  virtual T visitExprAssign (Assign<T>* expr) = 0;
 };
 
 template <typename T>
@@ -91,6 +95,17 @@ class Variable : public Expr<T> {
   Variable( Token name) : name(name) {}
   T accept (ExprAstVisitor<T>* visitor) {
     return visitor->visitExprVariable(this);
+  }
+};
+
+template <typename T>
+class Assign : public Expr<T> {
+  public:
+  Token name;
+  Expr<T>* value;
+  Assign( Token name, Expr<T>* value) : name(name), value(value) {}
+  T accept (ExprAstVisitor<T>* visitor) {
+    return visitor->visitExprAssign(this);
   }
 };
 #endif

@@ -20,6 +20,7 @@ class Interpreter : ExprAstVisitor<Obj>, StmtAstVisitor<Obj> {
 public:
   bool err;
   Interpreter();
+  Obj visitExprAssign(Assign<Obj> *expr) override;
   Obj visitExprBinary(Binary<Obj> *expr) override;
   Obj visitExprGrouping(Grouping<Obj> *expr) override;
   Obj visitExprLiteral(Literal<Obj> *expr) override;
@@ -34,6 +35,7 @@ public:
 private:
   static Environment env;
   Obj evaluate(Expr<Obj> *expr);
+  void assign(Token name, Obj value);
   bool isTrue(Obj value);
   bool isEqual(Obj v1, Obj v2);
   void checkNumberOperand(Token token, Obj operand);

@@ -19,6 +19,10 @@ expr_ast_types = [
     ]),
     ("Variable", [
         ("Token", "name")
+    ]),
+    ("Assign", [
+        ("Token", "name"),
+        ("Expr<T>*", "value")
     ])
 ]
 

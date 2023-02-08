@@ -14,6 +14,7 @@ private:
 
 public:
   void define(string name, Obj val);
+  void assign(Token name, Obj value);
   Obj get(Token name);
   void clear();
 };

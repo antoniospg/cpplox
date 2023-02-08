@@ -14,6 +14,13 @@ Interpreter::Interpreter() : err(false) {
   // env.clear();
 }
 
+Obj Interpreter::visitExprAssign(Assign<Obj> *expr) {
+  Obj value = evaluate(expr->value);
+  env.assign(expr->name, value);
+
+  return value;
+}
+
 Obj Interpreter::visitExprLiteral(Literal<Obj> *expr) { return expr->value; }
 
 Obj Interpreter::visitExprGrouping(Grouping<Obj> *expr) {
