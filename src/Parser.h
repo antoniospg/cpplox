@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <list>
 
 #include "Lex.h"
 #include "gen/Expr.hpp"
@@ -43,6 +44,7 @@ public:
   Stmt<T> *varDeclaration();
   Stmt<T> *statement();
   Stmt<T> *printStatement();
+  list<Stmt<T> *> block();
   Stmt<T> *expressionStatement();
 
 private:

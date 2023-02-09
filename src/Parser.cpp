@@ -249,6 +249,7 @@ Stmt<T> *Parser<T>::varDeclaration() {
 template <typename T>
 Stmt<T> *Parser<T>::statement() {
   if (match({PRINT})) return printStatement();
+  if (match({LEFT_BRACE})) return new Block(block());
 
   return expressionStatement();
 }
@@ -259,6 +260,18 @@ Stmt<T> *Parser<T>::printStatement() {
   consume(SEMICOLON, "Expected ';' after expression");
 
   return new Print<T>(value);
+}
+
+template <typename T>
+list<Stmt<T> *> Parser<T>::block() {
+  list<Stmt<T> *> stmts;
+
+  while (!check(RIGHT_BRACE)) {
+    stmts.push_back(declaration());
+  }
+
+  consume(RIGHT_BRACE, "Expect '}' after block.");
+  return stmts;
 }
 
 template <typename T>

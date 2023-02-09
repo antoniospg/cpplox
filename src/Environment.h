@@ -11,8 +11,11 @@ using namespace std;
 class Environment {
 private:
   map<string, Obj> values;
+  Environment *enclosing;
 
 public:
+  Environment();
+  Environment(Environment *enclosing);
   void define(string name, Obj val);
   void assign(Token name, Obj value);
   Obj get(Token name);

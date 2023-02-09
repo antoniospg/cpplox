@@ -48,10 +48,10 @@ class Expr {
 template <typename T>
 class Binary : public Expr<T> {
   public:
-  Expr<T>* left;
+  Expr<T> * left;
   Token op;
-  Expr<T>* right;
-  Binary( Expr<T>* left, Token op, Expr<T>* right) : left(left), op(op), right(right) {}
+  Expr<T> * right;
+  Binary( Expr<T> * left, Token op, Expr<T> * right) : left(left), op(op), right(right) {}
   T accept (ExprAstVisitor<T>* visitor) {
     return visitor->visitExprBinary(this);
   }
@@ -60,8 +60,8 @@ class Binary : public Expr<T> {
 template <typename T>
 class Grouping : public Expr<T> {
   public:
-  Expr<T>* grouping;
-  Grouping( Expr<T>* grouping) : grouping(grouping) {}
+  Expr<T> * grouping;
+  Grouping( Expr<T> * grouping) : grouping(grouping) {}
   T accept (ExprAstVisitor<T>* visitor) {
     return visitor->visitExprGrouping(this);
   }
@@ -81,8 +81,8 @@ template <typename T>
 class Unary : public Expr<T> {
   public:
   Token op;
-  Expr<T>* right;
-  Unary( Token op, Expr<T>* right) : op(op), right(right) {}
+  Expr<T> * right;
+  Unary( Token op, Expr<T> * right) : op(op), right(right) {}
   T accept (ExprAstVisitor<T>* visitor) {
     return visitor->visitExprUnary(this);
   }
@@ -102,8 +102,8 @@ template <typename T>
 class Assign : public Expr<T> {
   public:
   Token name;
-  Expr<T>* value;
-  Assign( Token name, Expr<T>* value) : name(name), value(value) {}
+  Expr<T> * value;
+  Assign( Token name, Expr<T> * value) : name(name), value(value) {}
   T accept (ExprAstVisitor<T>* visitor) {
     return visitor->visitExprAssign(this);
   }
