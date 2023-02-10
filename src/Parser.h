@@ -1,10 +1,10 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include <list>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <list>
 
 #include "Lex.h"
 #include "gen/Expr.hpp"
@@ -13,12 +13,13 @@
 using namespace std;
 
 class ParserError : public runtime_error {
-public:
+ public:
   ParserError() : runtime_error("") {}
 };
 
-template <typename T> class Parser {
-public:
+template <typename T>
+class Parser {
+ public:
   bool err;
 
   Parser(vector<Token> tokens);
@@ -34,6 +35,8 @@ public:
   vector<Stmt<T> *> parse();
   Expr<T> *assignment();
   Expr<T> *expression();
+  Expr<T> *orOp();
+  Expr<T> *andOp();
   Expr<T> *equality();
   Expr<T> *comparison();
   Expr<T> *term();
@@ -42,13 +45,15 @@ public:
   Expr<T> *primary();
   Stmt<T> *declaration();
   Stmt<T> *varDeclaration();
+  Stmt<T> *whileStatement();
   Stmt<T> *statement();
+  Stmt<T> *forStatement();
   Stmt<T> *ifStatement();
   Stmt<T> *printStatement();
   list<Stmt<T> *> block();
   Stmt<T> *expressionStatement();
 
-private:
+ private:
   vector<Token> tokens;
   int current;
 };

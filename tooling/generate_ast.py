@@ -13,6 +13,11 @@ expr_ast_types = [
     ("Literal", [
         ("Obj", "value")
     ]),
+    ("Logical", [
+        ("Expr<T> *", "left"),
+        ("Token", "op"),
+        ("Expr<T> *", "right")
+    ]),
     ("Unary", [
         ("Token", "op"),
         ("Expr<T> *", "right")
@@ -41,6 +46,10 @@ stmt_ast_types = [
     ("Var", [
         ("Token", "name"),
         ("Expr<T> *", "initializer"),
+    ]),
+    ("While", [
+        ("Expr<T> *", "condition"),
+        ("Stmt<T> *", "body")
     ]),
     ("Block", [
         ("list<Stmt<T> *>", "statements")

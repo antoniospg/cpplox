@@ -16,6 +16,9 @@ template <typename T>
 class Literal;
 
 template <typename T>
+class Logical;
+
+template <typename T>
 class Unary;
 
 template <typename T>
@@ -33,6 +36,7 @@ public:
   virtual T visitExprBinary (Binary<T>* expr) = 0;
   virtual T visitExprGrouping (Grouping<T>* expr) = 0;
   virtual T visitExprLiteral (Literal<T>* expr) = 0;
+  virtual T visitExprLogical (Logical<T>* expr) = 0;
   virtual T visitExprUnary (Unary<T>* expr) = 0;
   virtual T visitExprVariable (Variable<T>* expr) = 0;
   virtual T visitExprAssign (Assign<T>* expr) = 0;
@@ -74,6 +78,18 @@ class Literal : public Expr<T> {
   Literal( Obj value) : value(value) {}
   T accept (ExprAstVisitor<T>* visitor) {
     return visitor->visitExprLiteral(this);
+  }
+};
+
+template <typename T>
+class Logical : public Expr<T> {
+  public:
+  Expr<T> * left;
+  Token op;
+  Expr<T> * right;
+  Logical( Expr<T> * left, Token op, Expr<T> * right) : left(left), op(op), right(right) {}
+  T accept (ExprAstVisitor<T>* visitor) {
+    return visitor->visitExprLogical(this);
   }
 };
 

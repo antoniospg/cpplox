@@ -21,6 +21,9 @@ template <typename T>
 class Var;
 
 template <typename T>
+class While;
+
+template <typename T>
 class Block;
 
 template <typename T>
@@ -33,6 +36,7 @@ public:
   virtual T visitStmtIf (If<T>* stmt) = 0;
   virtual T visitStmtPrint (Print<T>* stmt) = 0;
   virtual T visitStmtVar (Var<T>* stmt) = 0;
+  virtual T visitStmtWhile (While<T>* stmt) = 0;
   virtual T visitStmtBlock (Block<T>* stmt) = 0;
 };
 
@@ -83,6 +87,17 @@ class Var : public Stmt<T> {
   Var( Token name, Expr<T> * initializer) : name(name), initializer(initializer) {}
   T accept (StmtAstVisitor<T>* visitor) {
     return visitor->visitStmtVar(this);
+  }
+};
+
+template <typename T>
+class While : public Stmt<T> {
+  public:
+  Expr<T> * condition;
+  Stmt<T> * body;
+  While( Expr<T> * condition, Stmt<T> * body) : condition(condition), body(body) {}
+  T accept (StmtAstVisitor<T>* visitor) {
+    return visitor->visitStmtWhile(this);
   }
 };
 

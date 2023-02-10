@@ -23,6 +23,18 @@ Obj Interpreter::visitExprAssign(Assign<Obj> *expr) {
 
 Obj Interpreter::visitExprLiteral(Literal<Obj> *expr) { return expr->value; }
 
+Obj Interpreter::visitExprLogical(Logical<Obj> *expr) {
+  Obj left = evaluate(expr->left);
+
+  if (expr->op.type == OR) {
+    if (isTrue(left)) return left;
+  } else {
+    if (!isTrue(left)) return left;
+  }
+
+  return evaluate(expr->right);
+}
+
 Obj Interpreter::visitExprGrouping(Grouping<Obj> *expr) {
   return evaluate(expr->grouping);
 }
@@ -127,6 +139,12 @@ Obj Interpreter::visitStmtVar(Var<Obj> *stmt) {
   if (stmt->initializer != nullptr) val = evaluate(stmt->initializer);
 
   env.define(stmt->name.lexeme, val);
+  return monostate();
+}
+
+Obj Interpreter::visitStmtWhile(While<Obj> *stmt) {
+  while (isTrue(evaluate(stmt->condition))) execute(stmt->body);
+
   return monostate();
 }
 

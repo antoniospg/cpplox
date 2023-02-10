@@ -115,7 +115,7 @@ Expr<T> *Parser<T>::expression() {
 
 template <typename T>
 Expr<T> *Parser<T>::assignment() {
-  Expr<T> *expr = equality();
+  Expr<T> *expr = orOp();
 
   if (match({EQUAL})) {
     Token equals = getPrevious();
@@ -128,6 +128,34 @@ Expr<T> *Parser<T>::assignment() {
     }
 
     error(equals, "Invalid assignment target.");
+  }
+
+  return expr;
+}
+
+template <typename T>
+Expr<T> *Parser<T>::orOp() {
+  Expr<T> *expr = andOp();
+
+  while (match({OR})) {
+    Token op = getPrevious();
+    Expr<T> *right = andOp();
+
+    expr = new Logical<T>(expr, op, right);
+  }
+
+  return expr;
+}
+
+template <typename T>
+Expr<T> *Parser<T>::andOp() {
+  Expr<T> *expr = equality();
+
+  while (match({OR})) {
+    Token op = getPrevious();
+    Expr<T> *right = equality();
+
+    expr = new Logical<T>(expr, op, right);
   }
 
   return expr;
@@ -247,12 +275,59 @@ Stmt<T> *Parser<T>::varDeclaration() {
 }
 
 template <typename T>
+Stmt<T> *Parser<T>::whileStatement() {
+  consume(LEFT_PAREN, "Expect '(' after 'while'.");
+  Expr<T> *condition = expression();
+  consume(RIGHT_PAREN, "Expect ')' after 'while' condition.");
+
+  Stmt<T> *body = statement();
+  return new While(condition, body);
+}
+
+template <typename T>
 Stmt<T> *Parser<T>::statement() {
+  if (match({FOR})) return forStatement();
   if (match({IF})) return ifStatement();
   if (match({PRINT})) return printStatement();
+  if (match({WHILE})) return whileStatement();
   if (match({LEFT_BRACE})) return new Block(block());
 
   return expressionStatement();
+}
+
+template <typename T>
+Stmt<T> *Parser<T>::forStatement() {
+  consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+  Stmt<T> *initializer;
+  if (match({SEMICOLON}))
+    initializer = nullptr;
+  else if (match({VAR}))
+    initializer = varDeclaration();
+  else
+    initializer = expressionStatement();
+
+  Expr<T> *condition = nullptr;
+  if (!check(SEMICOLON)) condition = expression();
+
+  consume(SEMICOLON, "Expect ';' after loop condition.");
+
+  Expr<T> *increment = nullptr;
+  if (!check(RIGHT_PAREN)) increment = expression();
+
+  consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+
+  Stmt<T> *body = statement();
+
+  if (increment != nullptr)
+    body = new Block<T>({body, new Expression<T>(increment)});
+
+  if (condition == nullptr) condition = new Literal<T>(true);
+  body = new While<T>(condition, body);
+
+  if (initializer != nullptr) body = new Block<T>({initializer, body});
+
+  return body;
 }
 
 template <typename T>
@@ -264,8 +339,7 @@ Stmt<T> *Parser<T>::ifStatement() {
   Stmt<T> *thenBranch = statement();
   Stmt<T> *elseBranch = nullptr;
 
-  if (match({ELSE}))
-      elseBranch = statement();
+  if (match({ELSE})) elseBranch = statement();
 
   return new If<T>(condition, thenBranch, elseBranch);
 }
