@@ -137,7 +137,7 @@ template <typename T>
 Expr<T> *Parser<T>::equality() {
   Expr<T> *expr = comparison();
 
-  while (match({BANG, BANG_EQUAL})) {
+  while (match({BANG, BANG_EQUAL, EQUAL_EQUAL})) {
     auto op = getPrevious();
     Expr<T> *right = comparison();
 
@@ -248,10 +248,26 @@ Stmt<T> *Parser<T>::varDeclaration() {
 
 template <typename T>
 Stmt<T> *Parser<T>::statement() {
+  if (match({IF})) return ifStatement();
   if (match({PRINT})) return printStatement();
   if (match({LEFT_BRACE})) return new Block(block());
 
   return expressionStatement();
+}
+
+template <typename T>
+Stmt<T> *Parser<T>::ifStatement() {
+  consume(LEFT_PAREN, "Expect '(' after 'if'.");
+  Expr<T> *condition = expression();
+  consume(RIGHT_PAREN, "Expect ')' after 'if' condition.");
+
+  Stmt<T> *thenBranch = statement();
+  Stmt<T> *elseBranch = nullptr;
+
+  if (match({ELSE}))
+      elseBranch = statement();
+
+  return new If<T>(condition, thenBranch, elseBranch);
 }
 
 template <typename T>

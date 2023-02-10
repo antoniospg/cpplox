@@ -12,6 +12,9 @@ template <typename T>
 class Expression;
 
 template <typename T>
+class If;
+
+template <typename T>
 class Print;
 
 template <typename T>
@@ -27,6 +30,7 @@ template <typename T>
 class StmtAstVisitor {
 public:
   virtual T visitStmtExpression (Expression<T>* stmt) = 0;
+  virtual T visitStmtIf (If<T>* stmt) = 0;
   virtual T visitStmtPrint (Print<T>* stmt) = 0;
   virtual T visitStmtVar (Var<T>* stmt) = 0;
   virtual T visitStmtBlock (Block<T>* stmt) = 0;
@@ -46,6 +50,18 @@ class Expression : public Stmt<T> {
   Expression( Expr<T> * expr) : expr(expr) {}
   T accept (StmtAstVisitor<T>* visitor) {
     return visitor->visitStmtExpression(this);
+  }
+};
+
+template <typename T>
+class If : public Stmt<T> {
+  public:
+  Expr<T> * condition;
+  Stmt<T> * thenBranch;
+  Stmt<T> * elseBranch;
+  If( Expr<T> * condition, Stmt<T> * thenBranch, Stmt<T> * elseBranch) : condition(condition), thenBranch(thenBranch), elseBranch(elseBranch) {}
+  T accept (StmtAstVisitor<T>* visitor) {
+    return visitor->visitStmtIf(this);
   }
 };
 

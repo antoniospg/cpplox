@@ -69,7 +69,7 @@ Obj Interpreter::visitExprBinary(Binary<Obj> *expr) {
     case LESS_EQUAL:
       checkNumberOperand(expr->op, left, right);
       return get<double>(left) <= get<double>(right);
-    case EQUAL:
+    case EQUAL_EQUAL:
       checkNumberOperand(expr->op, left, right);
       return isEqual(left, right);
     case BANG_EQUAL:
@@ -103,6 +103,16 @@ Obj Interpreter::visitExprBinary(Binary<Obj> *expr) {
 
 Obj Interpreter::visitStmtExpression(Expression<Obj> *stmt) {
   evaluate(reinterpret_cast<Expr<Obj> *>(stmt->expr));
+  return monostate();
+}
+
+Obj Interpreter::visitStmtIf(If<Obj> *stmt) {
+  if (isTrue(evaluate(stmt->condition))) {
+    execute(stmt->thenBranch);
+  } else if (stmt->elseBranch) {
+    execute(stmt->elseBranch);
+  }
+
   return monostate();
 }
 

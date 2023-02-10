@@ -1,5 +1,10 @@
-var a = 1;
-{
-  var a = a + 2;
-  print a;
+var a = 2;
+
+if (a == 1) {
+  a = 2;
 }
+else {
+  a = 3;
+}
+
+print(a);

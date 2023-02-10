@@ -30,6 +30,11 @@ stmt_ast_types = [
     ("Expression", [
         ("Expr<T> *", "expr")
     ]),
+    ("If", [
+        ("Expr<T> *", "condition"),
+        ("Stmt<T> *", "thenBranch"),
+        ("Stmt<T> *", "elseBranch")
+    ]),
     ("Print", [
         ("Expr<T> *", "expr")
     ]),

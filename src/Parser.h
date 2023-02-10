@@ -43,6 +43,7 @@ public:
   Stmt<T> *declaration();
   Stmt<T> *varDeclaration();
   Stmt<T> *statement();
+  Stmt<T> *ifStatement();
   Stmt<T> *printStatement();
   list<Stmt<T> *> block();
   Stmt<T> *expressionStatement();

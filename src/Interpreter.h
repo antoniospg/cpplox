@@ -28,6 +28,7 @@ public:
   Obj visitExprVariable(Variable<Obj> *expr) override;
   Obj visitStmtBlock(Block<Obj> *stmt) override;
   Obj visitStmtExpression(Expression<Obj> *expr) override;
+  Obj visitStmtIf(If<Obj> *stmt) override;
   Obj visitStmtPrint(Print<Obj> *expr) override;
   Obj visitStmtVar(Var<Obj> *stmt) override;
   void execute(Stmt<Obj> *stmt);
