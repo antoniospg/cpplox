@@ -27,6 +27,7 @@ CC_FLAGS=-c         \
          -W         \
          -Wall      \
          -ansi      \
+         -g      \
          -pedantic \
 				 -std=c++17
 
