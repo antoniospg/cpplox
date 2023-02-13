@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <list>
 
 #include "Environment.h"
 #include "Util.h"
@@ -19,9 +20,11 @@ class RuntimeError : public runtime_error {
 class Interpreter : ExprAstVisitor<Obj>, StmtAstVisitor<Obj> {
    public:
     bool err;
+    Environment *globals;
     Interpreter();
     Obj visitExprAssign(Assign<Obj> *expr) override;
     Obj visitExprBinary(Binary<Obj> *expr) override;
+    Obj visitExprCall(Call<Obj> *expr) override;
     Obj visitExprGrouping(Grouping<Obj> *expr) override;
     Obj visitExprLiteral(Literal<Obj> *expr) override;
     Obj visitExprLogical(Logical<Obj> *expr) override;
@@ -29,16 +32,17 @@ class Interpreter : ExprAstVisitor<Obj>, StmtAstVisitor<Obj> {
     Obj visitExprVariable(Variable<Obj> *expr) override;
     Obj visitStmtBlock(Block<Obj> *stmt) override;
     Obj visitStmtExpression(Expression<Obj> *expr) override;
+    Obj visitStmtFunction(Function<Obj> *expr) override;
     Obj visitStmtIf(If<Obj> *stmt) override;
     Obj visitStmtPrint(Print<Obj> *expr) override;
     Obj visitStmtVar(Var<Obj> *stmt) override;
     Obj visitStmtWhile(While<Obj> *stmt) override;
     void execute(Stmt<Obj> *stmt);
-    void executeBlock(list<Stmt<Obj> *> stmts, Environment env);
+    void executeBlock(list<Stmt<Obj> *> stmts, Environment *env);
     void interpret(vector<Stmt<Obj> *> expr);
 
    private:
-    static Environment env;
+    Environment *env;
     Obj evaluate(Expr<Obj> *expr);
     void assign(Token name, Obj value);
     bool isTrue(Obj value);

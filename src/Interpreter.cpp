@@ -5,18 +5,21 @@
 #include <string>
 #include <variant>
 
+#include "Callable.h"
+
 using namespace std;
 
-Environment Interpreter::env;
-
 Interpreter::Interpreter() : err(false) {
-  // Clear static field env
-  // env.clear();
+  // Initialize environments
+  globals = new Environment();
+  env = globals;
+
+  globals->define("clock", new ClockCallable());
 }
 
 Obj Interpreter::visitExprAssign(Assign<Obj> *expr) {
   Obj value = evaluate(expr->value);
-  env.assign(expr->name, value);
+  env->assign(expr->name, value);
 
   return value;
 }
@@ -56,12 +59,30 @@ Obj Interpreter::visitExprUnary(Unary<Obj> *expr) {
 }
 
 Obj Interpreter::visitStmtBlock(Block<Obj> *stmt) {
-  executeBlock(stmt->statements, Environment(env));
+  executeBlock(stmt->statements, new Environment(env));
   return monostate();
 }
 
 Obj Interpreter::visitExprVariable(Variable<Obj> *expr) {
-  return env.get(expr->name);
+  return env->get(expr->name);
+}
+
+Obj Interpreter::visitExprCall(Call<Obj> *expr) {
+  auto callee = evaluate(expr->callee);
+
+  list<Obj> arguments;
+  for (auto arg : expr->arguments) arguments.push_back(evaluate(arg));
+
+  if (!holds_alternative<Callable *>(callee))
+    throw RuntimeError(expr->paren, "Can only call functions and classes.");
+
+  Callable *function = get<Callable *>(callee);
+  if (arguments.size() != function->arity())
+    throw RuntimeError(expr->paren,
+                       to_string("Expected ") + to_string(function->arity()) +
+                           to_string(" arguments but got ") +
+                           to_string(arguments.size()) + to_string('.'));
+  return function->call(*this, arguments);
 }
 
 Obj Interpreter::visitExprBinary(Binary<Obj> *expr) {
@@ -118,6 +139,12 @@ Obj Interpreter::visitStmtExpression(Expression<Obj> *stmt) {
   return monostate();
 }
 
+Obj Interpreter::visitStmtFunction(Function<Obj> *stmt) {
+  FunctionCallable *function = new FunctionCallable(stmt);
+  env->define(stmt->name.lexeme, function);
+  return monostate();
+}
+
 Obj Interpreter::visitStmtIf(If<Obj> *stmt) {
   if (isTrue(evaluate(stmt->condition))) {
     execute(stmt->thenBranch);
@@ -138,7 +165,7 @@ Obj Interpreter::visitStmtVar(Var<Obj> *stmt) {
   Obj val = monostate();
   if (stmt->initializer != nullptr) val = evaluate(stmt->initializer);
 
-  env.define(stmt->name.lexeme, val);
+  env->define(stmt->name.lexeme, val);
   return monostate();
 }
 
@@ -180,8 +207,8 @@ bool Interpreter::isEqual(Obj v1, Obj v2) {
 
 void Interpreter::execute(Stmt<Obj> *stmt) { stmt->accept(this); }
 
-void Interpreter::executeBlock(list<Stmt<Obj> *> stmts, Environment env) {
-  Environment previous = this->env;
+void Interpreter::executeBlock(list<Stmt<Obj> *> stmts, Environment *env) {
+  Environment *previous = this->env;
   try {
     this->env = env;
 

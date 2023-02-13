@@ -42,8 +42,11 @@ class Parser {
   Expr<T> *term();
   Expr<T> *factor();
   Expr<T> *unary();
+  Expr<T> *call();
+  Expr<T> *finishCall(Expr<T> *callee);
   Expr<T> *primary();
   Stmt<T> *declaration();
+  Stmt<T> *function(string kind);
   Stmt<T> *varDeclaration();
   Stmt<T> *whileStatement();
   Stmt<T> *statement();

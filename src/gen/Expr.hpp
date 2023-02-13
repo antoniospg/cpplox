@@ -2,12 +2,16 @@
 #define EXPR_HPP
 #include <string>
 #include <memory>
+#include <list>
 #include "../Lex.h"
 #include "../Util.h"
 using namespace std;
 
 template <typename T>
 class Binary;
+
+template <typename T>
+class Call;
 
 template <typename T>
 class Grouping;
@@ -34,6 +38,7 @@ template <typename T>
 class ExprAstVisitor {
 public:
   virtual T visitExprBinary (Binary<T>* expr) = 0;
+  virtual T visitExprCall (Call<T>* expr) = 0;
   virtual T visitExprGrouping (Grouping<T>* expr) = 0;
   virtual T visitExprLiteral (Literal<T>* expr) = 0;
   virtual T visitExprLogical (Logical<T>* expr) = 0;
@@ -58,6 +63,18 @@ class Binary : public Expr<T> {
   Binary( Expr<T> * left, Token op, Expr<T> * right) : left(left), op(op), right(right) {}
   T accept (ExprAstVisitor<T>* visitor) {
     return visitor->visitExprBinary(this);
+  }
+};
+
+template <typename T>
+class Call : public Expr<T> {
+  public:
+  Expr<T> * callee;
+  Token paren;
+  list<Expr<T> *> arguments;
+  Call( Expr<T> * callee, Token paren, list<Expr<T> *> arguments) : callee(callee), paren(paren), arguments(arguments) {}
+  T accept (ExprAstVisitor<T>* visitor) {
+    return visitor->visitExprCall(this);
   }
 };
 

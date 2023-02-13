@@ -7,6 +7,11 @@ expr_ast_types = [
         ("Token", "op"),
         ("Expr<T> *", "right")
     ]),
+    ("Call", [
+        ("Expr<T> *", "callee"),
+        ("Token", "paren"),
+        ("list<Expr<T> *>", "arguments")
+    ]),
     ("Grouping", [
         ("Expr<T> *", "grouping")
     ]),
@@ -34,6 +39,11 @@ expr_ast_types = [
 stmt_ast_types = [
     ("Expression", [
         ("Expr<T> *", "expr")
+    ]),
+    ("Function", [
+        ("Token", "name"),
+        ("list<Token>", "params"),
+        ("list<Stmt<T> *>", "body"),
     ]),
     ("If", [
         ("Expr<T> *", "condition"),
@@ -63,6 +73,7 @@ base_name = "Expr"
 builder = CppBuilder(file_path + "/" + "Expr.hpp", "EXPR_HPP")
 builder.build_include("<string>")
 builder.build_include("<memory>")
+builder.build_include("<list>")
 builder.build_include("\"../Lex.h\"")
 builder.build_include("\"../Util.h\"")
 builder.build_using_namespace("std")

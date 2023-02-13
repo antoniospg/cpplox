@@ -223,7 +223,38 @@ Expr<T> *Parser<T>::unary() {
     return expr;
   }
 
-  return primary();
+  return call();
+}
+
+template <typename T>
+Expr<T> *Parser<T>::call() {
+  auto expr = primary();
+
+  while (true) {
+    if (match({LEFT_PAREN}))
+      expr = finishCall(expr);
+    else
+      break;
+  }
+
+  return expr;
+}
+
+template <typename T>
+Expr<T> *Parser<T>::finishCall(Expr<T> *callee) {
+  list<Expr<T> *> arguments;
+
+  if (!check(RIGHT_PAREN)) {
+    do {
+      if (arguments.size() >= 255)
+        error(lookahead(), "Can't have more than 255 arguments");
+      arguments.push_back(expression());
+    } while (match({COMMA}));
+  }
+
+  Token paren = consume(RIGHT_PAREN, "Expected ')' after arguments.");
+
+  return new Call<T>(callee, paren, arguments);
 }
 
 template <typename T>
@@ -253,12 +284,38 @@ Expr<T> *Parser<T>::primary() {
 template <typename T>
 Stmt<T> *Parser<T>::declaration() {
   try {
+    if (match({FUN})) return function("function");
     if (match({VAR})) return varDeclaration();
     return statement();
   } catch (ParserError error) {
     // sync();
     return nullptr;
   }
+}
+
+template <typename T>
+Stmt<T> *Parser<T>::function(string kind) {
+  Token name =
+      consume(IDENTIFIER, to_string("Expect ") + kind + to_string(" name."));
+  consume(LEFT_PAREN,
+          to_string("Expect '(' after ") + kind + to_string(" name."));
+
+  list<Token> parameters;
+  if (!check(RIGHT_PAREN)) {
+    do {
+      if (parameters.size() >= 255)
+        error(lookahead(), "Can't have more than 255 parameters");
+
+      parameters.push_back(consume(IDENTIFIER, "Expect parameter name."));
+    } while (match({COMMA}));
+  }
+
+  consume(RIGHT_PAREN, "Expect ')' after parameters.");
+  consume(LEFT_BRACE,
+          to_string("Expect '{' before ") + kind + to_string(" body."));
+
+  list<Stmt<T> *> body = block();
+  return new Function<T>(name, parameters, body);
 }
 
 template <typename T>
