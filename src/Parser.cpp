@@ -13,43 +13,37 @@ template <typename T>
 Parser<T>::Parser(vector<Token> tokens)
     : err(false), tokens(tokens), current(0) {}
 
-template <typename T>
-bool Parser<T>::isEnd() {
+template <typename T> bool Parser<T>::isEnd() {
   return lookahead().type == EOF_TOK;
 }
 
-template <typename T>
-Token Parser<T>::lookahead() {
-  return tokens[current];
-}
+template <typename T> Token Parser<T>::lookahead() { return tokens[current]; }
 
-template <typename T>
-Token Parser<T>::getPrevious() {
+template <typename T> Token Parser<T>::getPrevious() {
   return tokens[current - 1];
 }
 
-template <typename T>
-Token Parser<T>::consume() {
-  if (!isEnd()) current++;
+template <typename T> Token Parser<T>::consume() {
+  if (!isEnd())
+    current++;
   return getPrevious();
 }
 
-template <typename T>
-Token Parser<T>::consume(TokenType type, string message) {
-  if (check(type)) return consume();
+template <typename T> Token Parser<T>::consume(TokenType type, string message) {
+  if (check(type))
+    return consume();
 
   throw error(lookahead(), message);
 }
 
-template <typename T>
-bool Parser<T>::check(TokenType val) {
-  if (isEnd()) return false;
+template <typename T> bool Parser<T>::check(TokenType val) {
+  if (isEnd())
+    return false;
 
   return lookahead().type == val;
 }
 
-template <typename T>
-bool Parser<T>::match(vector<TokenType> types) {
+template <typename T> bool Parser<T>::match(vector<TokenType> types) {
   for (auto type : types) {
     if (check(type)) {
       consume();
@@ -69,23 +63,23 @@ ParserError Parser<T>::error(Token token, string message) {
   return ParserError();
 }
 
-template <typename T>
-void Parser<T>::synchronize() {
+template <typename T> void Parser<T>::synchronize() {
   consume();
 
   while (!isEnd()) {
-    if (getPrevious().type == SEMICOLON) return;
+    if (getPrevious().type == SEMICOLON)
+      return;
 
     switch (lookahead().type) {
-      case CLASS:
-      case FUN:
-      case VAR:
-      case FOR:
-      case IF:
-      case WHILE:
-      case PRINT:
-      case RETURN:
-        return;
+    case CLASS:
+    case FUN:
+    case VAR:
+    case FOR:
+    case IF:
+    case WHILE:
+    case PRINT:
+    case RETURN:
+      return;
     }
 
     consume();
@@ -93,13 +87,13 @@ void Parser<T>::synchronize() {
 }
 
 // Build AST
-template <typename T>
-vector<Stmt<T> *> Parser<T>::parse() {
+template <typename T> vector<Stmt<T> *> Parser<T>::parse() {
   try {
     vector<Stmt<T> *> statements;
     while (!isEnd()) {
       auto stmt = declaration();
-      if (stmt != nullptr) statements.push_back(stmt);
+      if (stmt != nullptr)
+        statements.push_back(stmt);
     }
 
     return statements;
@@ -108,13 +102,9 @@ vector<Stmt<T> *> Parser<T>::parse() {
   }
 }
 
-template <typename T>
-Expr<T> *Parser<T>::expression() {
-  return assignment();
-}
+template <typename T> Expr<T> *Parser<T>::expression() { return assignment(); }
 
-template <typename T>
-Expr<T> *Parser<T>::assignment() {
+template <typename T> Expr<T> *Parser<T>::assignment() {
   Expr<T> *expr = orOp();
 
   if (match({EQUAL})) {
@@ -133,8 +123,7 @@ Expr<T> *Parser<T>::assignment() {
   return expr;
 }
 
-template <typename T>
-Expr<T> *Parser<T>::orOp() {
+template <typename T> Expr<T> *Parser<T>::orOp() {
   Expr<T> *expr = andOp();
 
   while (match({OR})) {
@@ -147,8 +136,7 @@ Expr<T> *Parser<T>::orOp() {
   return expr;
 }
 
-template <typename T>
-Expr<T> *Parser<T>::andOp() {
+template <typename T> Expr<T> *Parser<T>::andOp() {
   Expr<T> *expr = equality();
 
   while (match({OR})) {
@@ -161,8 +149,7 @@ Expr<T> *Parser<T>::andOp() {
   return expr;
 }
 
-template <typename T>
-Expr<T> *Parser<T>::equality() {
+template <typename T> Expr<T> *Parser<T>::equality() {
   Expr<T> *expr = comparison();
 
   while (match({BANG, BANG_EQUAL, EQUAL_EQUAL})) {
@@ -174,8 +161,7 @@ Expr<T> *Parser<T>::equality() {
   return expr;
 }
 
-template <typename T>
-Expr<T> *Parser<T>::comparison() {
+template <typename T> Expr<T> *Parser<T>::comparison() {
   Expr<T> *expr = term();
 
   while (match({GREATER, GREATER_EQUAL, LESS, LESS_EQUAL})) {
@@ -187,8 +173,7 @@ Expr<T> *Parser<T>::comparison() {
   return expr;
 }
 
-template <typename T>
-Expr<T> *Parser<T>::term() {
+template <typename T> Expr<T> *Parser<T>::term() {
   Expr<T> *expr = factor();
 
   while (match({MINUS, PLUS})) {
@@ -200,8 +185,7 @@ Expr<T> *Parser<T>::term() {
   return expr;
 }
 
-template <typename T>
-Expr<T> *Parser<T>::factor() {
+template <typename T> Expr<T> *Parser<T>::factor() {
   Expr<T> *expr = unary();
 
   while (match({SLASH, STAR})) {
@@ -213,8 +197,7 @@ Expr<T> *Parser<T>::factor() {
   return expr;
 }
 
-template <typename T>
-Expr<T> *Parser<T>::unary() {
+template <typename T> Expr<T> *Parser<T>::unary() {
   if (match({BANG, MINUS})) {
     auto op = getPrevious();
     Expr<T> *expr = unary();
@@ -226,8 +209,7 @@ Expr<T> *Parser<T>::unary() {
   return call();
 }
 
-template <typename T>
-Expr<T> *Parser<T>::call() {
+template <typename T> Expr<T> *Parser<T>::call() {
   auto expr = primary();
 
   while (true) {
@@ -240,8 +222,7 @@ Expr<T> *Parser<T>::call() {
   return expr;
 }
 
-template <typename T>
-Expr<T> *Parser<T>::finishCall(Expr<T> *callee) {
+template <typename T> Expr<T> *Parser<T>::finishCall(Expr<T> *callee) {
   list<Expr<T> *> arguments;
 
   if (!check(RIGHT_PAREN)) {
@@ -257,8 +238,7 @@ Expr<T> *Parser<T>::finishCall(Expr<T> *callee) {
   return new Call<T>(callee, paren, arguments);
 }
 
-template <typename T>
-Expr<T> *Parser<T>::primary() {
+template <typename T> Expr<T> *Parser<T>::primary() {
   if (match({FALSE}))
     return new Literal<T>("false");
   else if (match({TRUE}))
@@ -281,11 +261,12 @@ Expr<T> *Parser<T>::primary() {
   }
 }
 
-template <typename T>
-Stmt<T> *Parser<T>::declaration() {
+template <typename T> Stmt<T> *Parser<T>::declaration() {
   try {
-    if (match({FUN})) return function("function");
-    if (match({VAR})) return varDeclaration();
+    if (match({FUN}))
+      return function("function");
+    if (match({VAR}))
+      return varDeclaration();
     return statement();
   } catch (ParserError error) {
     // sync();
@@ -293,8 +274,7 @@ Stmt<T> *Parser<T>::declaration() {
   }
 }
 
-template <typename T>
-Stmt<T> *Parser<T>::function(string kind) {
+template <typename T> Stmt<T> *Parser<T>::function(string kind) {
   Token name =
       consume(IDENTIFIER, to_string("Expect ") + kind + to_string(" name."));
   consume(LEFT_PAREN,
@@ -318,8 +298,7 @@ Stmt<T> *Parser<T>::function(string kind) {
   return new Function<T>(name, parameters, body);
 }
 
-template <typename T>
-Stmt<T> *Parser<T>::varDeclaration() {
+template <typename T> Stmt<T> *Parser<T>::varDeclaration() {
   Token name = consume(IDENTIFIER, "Expect variable name.");
 
   Expr<T> *initializer = nullptr;
@@ -331,8 +310,7 @@ Stmt<T> *Parser<T>::varDeclaration() {
   return new Var<T>(name, initializer);
 }
 
-template <typename T>
-Stmt<T> *Parser<T>::whileStatement() {
+template <typename T> Stmt<T> *Parser<T>::whileStatement() {
   consume(LEFT_PAREN, "Expect '(' after 'while'.");
   Expr<T> *condition = expression();
   consume(RIGHT_PAREN, "Expect ')' after 'while' condition.");
@@ -341,19 +319,24 @@ Stmt<T> *Parser<T>::whileStatement() {
   return new While(condition, body);
 }
 
-template <typename T>
-Stmt<T> *Parser<T>::statement() {
-  if (match({FOR})) return forStatement();
-  if (match({IF})) return ifStatement();
-  if (match({PRINT})) return printStatement();
-  if (match({WHILE})) return whileStatement();
-  if (match({LEFT_BRACE})) return new Block(block());
+template <typename T> Stmt<T> *Parser<T>::statement() {
+  if (match({FOR}))
+    return forStatement();
+  if (match({IF}))
+    return ifStatement();
+  if (match({PRINT}))
+    return printStatement();
+  if (match({RETURN}))
+    return returnStatement();
+  if (match({WHILE}))
+    return whileStatement();
+  if (match({LEFT_BRACE}))
+    return new Block(block());
 
   return expressionStatement();
 }
 
-template <typename T>
-Stmt<T> *Parser<T>::forStatement() {
+template <typename T> Stmt<T> *Parser<T>::forStatement() {
   consume(LEFT_PAREN, "Expect '(' after 'for'.");
 
   Stmt<T> *initializer;
@@ -365,12 +348,14 @@ Stmt<T> *Parser<T>::forStatement() {
     initializer = expressionStatement();
 
   Expr<T> *condition = nullptr;
-  if (!check(SEMICOLON)) condition = expression();
+  if (!check(SEMICOLON))
+    condition = expression();
 
   consume(SEMICOLON, "Expect ';' after loop condition.");
 
   Expr<T> *increment = nullptr;
-  if (!check(RIGHT_PAREN)) increment = expression();
+  if (!check(RIGHT_PAREN))
+    increment = expression();
 
   consume(RIGHT_PAREN, "Expect ')' after for clauses.");
 
@@ -379,16 +364,17 @@ Stmt<T> *Parser<T>::forStatement() {
   if (increment != nullptr)
     body = new Block<T>({body, new Expression<T>(increment)});
 
-  if (condition == nullptr) condition = new Literal<T>(true);
+  if (condition == nullptr)
+    condition = new Literal<T>(true);
   body = new While<T>(condition, body);
 
-  if (initializer != nullptr) body = new Block<T>({initializer, body});
+  if (initializer != nullptr)
+    body = new Block<T>({initializer, body});
 
   return body;
 }
 
-template <typename T>
-Stmt<T> *Parser<T>::ifStatement() {
+template <typename T> Stmt<T> *Parser<T>::ifStatement() {
   consume(LEFT_PAREN, "Expect '(' after 'if'.");
   Expr<T> *condition = expression();
   consume(RIGHT_PAREN, "Expect ')' after 'if' condition.");
@@ -396,21 +382,30 @@ Stmt<T> *Parser<T>::ifStatement() {
   Stmt<T> *thenBranch = statement();
   Stmt<T> *elseBranch = nullptr;
 
-  if (match({ELSE})) elseBranch = statement();
+  if (match({ELSE}))
+    elseBranch = statement();
 
   return new If<T>(condition, thenBranch, elseBranch);
 }
 
-template <typename T>
-Stmt<T> *Parser<T>::printStatement() {
+template <typename T> Stmt<T> *Parser<T>::printStatement() {
   Expr<T> *value = expression();
   consume(SEMICOLON, "Expected ';' after expression");
 
   return new Print<T>(value);
 }
 
-template <typename T>
-list<Stmt<T> *> Parser<T>::block() {
+template <typename T> Stmt<T> *Parser<T>::returnStatement() {
+  Token keyword = getPrevious();
+  Expr<T> *value = nullptr;
+  if (!check(SEMICOLON))
+    value = expression();
+
+  consume(SEMICOLON, "Expected ';' after return value");
+  return new Return<T>(keyword, value);
+}
+
+template <typename T> list<Stmt<T> *> Parser<T>::block() {
   list<Stmt<T> *> stmts;
 
   while (!check(RIGHT_BRACE)) {
@@ -421,8 +416,7 @@ list<Stmt<T> *> Parser<T>::block() {
   return stmts;
 }
 
-template <typename T>
-Stmt<T> *Parser<T>::expressionStatement() {
+template <typename T> Stmt<T> *Parser<T>::expressionStatement() {
   Expr<T> *value = expression();
   consume(SEMICOLON, "Expected ';' after value");
 

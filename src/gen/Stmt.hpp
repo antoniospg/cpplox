@@ -21,6 +21,9 @@ template <typename T>
 class Print;
 
 template <typename T>
+class Return;
+
+template <typename T>
 class Var;
 
 template <typename T>
@@ -39,6 +42,7 @@ public:
   virtual T visitStmtFunction (Function<T>* stmt) = 0;
   virtual T visitStmtIf (If<T>* stmt) = 0;
   virtual T visitStmtPrint (Print<T>* stmt) = 0;
+  virtual T visitStmtReturn (Return<T>* stmt) = 0;
   virtual T visitStmtVar (Var<T>* stmt) = 0;
   virtual T visitStmtWhile (While<T>* stmt) = 0;
   virtual T visitStmtBlock (Block<T>* stmt) = 0;
@@ -92,6 +96,17 @@ class Print : public Stmt<T> {
   Print( Expr<T> * expr) : expr(expr) {}
   T accept (StmtAstVisitor<T>* visitor) {
     return visitor->visitStmtPrint(this);
+  }
+};
+
+template <typename T>
+class Return : public Stmt<T> {
+  public:
+  Token keyword;
+  Expr<T> * value;
+  Return( Token keyword, Expr<T> * value) : keyword(keyword), value(value) {}
+  T accept (StmtAstVisitor<T>* visitor) {
+    return visitor->visitStmtReturn(this);
   }
 };
 

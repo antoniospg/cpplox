@@ -13,13 +13,12 @@
 using namespace std;
 
 class ParserError : public runtime_error {
- public:
+public:
   ParserError() : runtime_error("") {}
 };
 
-template <typename T>
-class Parser {
- public:
+template <typename T> class Parser {
+public:
   bool err;
 
   Parser(vector<Token> tokens);
@@ -53,10 +52,12 @@ class Parser {
   Stmt<T> *forStatement();
   Stmt<T> *ifStatement();
   Stmt<T> *printStatement();
+  Stmt<T> *returnStatement();
+  Stmt<T> *Statement();
   list<Stmt<T> *> block();
   Stmt<T> *expressionStatement();
 
- private:
+private:
   vector<Token> tokens;
   int current;
 };

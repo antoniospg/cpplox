@@ -1,5 +1,6 @@
 #include "Callable.h"
 
+#include "Return.h"
 #include <chrono>
 #include <iostream>
 #include <string>
@@ -10,7 +11,7 @@ using std::string;
 // Clock native function stuff
 int ClockCallable::arity() { return 0; }
 
-Obj ClockCallable::call(Interpreter& interpreter, list<Obj> arguments) {
+Obj ClockCallable::call(Interpreter &interpreter, list<Obj> arguments) {
   double time =
       duration_cast<milliseconds>(system_clock::now().time_since_epoch())
           .count() /
@@ -21,10 +22,10 @@ Obj ClockCallable::call(Interpreter& interpreter, list<Obj> arguments) {
 string ClockCallable::to_string() { return "<native fn>"; }
 
 // Function stuff
-FunctionCallable::FunctionCallable(Function<Obj>* declaration)
+FunctionCallable::FunctionCallable(Function<Obj> *declaration)
     : declaration(declaration) {}
 
-Obj FunctionCallable::call(Interpreter& interpreter, list<Obj> arguments) {
+Obj FunctionCallable::call(Interpreter &interpreter, list<Obj> arguments) {
   auto env = new Environment(interpreter.globals);
 
   auto param_itr = declaration->params.begin();
@@ -35,7 +36,12 @@ Obj FunctionCallable::call(Interpreter& interpreter, list<Obj> arguments) {
     args_itr++;
   }
 
-  interpreter.executeBlock(declaration->body, env);
+  try {
+    interpreter.executeBlock(declaration->body, env);
+  } catch (ReturnError ret) {
+    return ret.value;
+  }
+
   return monostate();
 }
 

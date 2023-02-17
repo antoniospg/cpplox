@@ -5,27 +5,27 @@
 #include "Util.h"
 
 class Callable {
- public:
+public:
   virtual int arity() = 0;
-  virtual Obj call(Interpreter& interpreter, list<Obj> arguments) = 0;
+  virtual Obj call(Interpreter &interpreter, list<Obj> arguments) = 0;
   virtual string to_string() = 0;
 };
 
 class ClockCallable : public Callable {
   int arity() override;
-  Obj call(Interpreter& interpreter, list<Obj> arguments) override;
+  Obj call(Interpreter &interpreter, list<Obj> arguments) override;
   string to_string() override;
 };
 
 class FunctionCallable : public Callable {
- public:
+public:
   int arity() override;
-  Obj call(Interpreter& interpreter, list<Obj> arguments) override;
+  Obj call(Interpreter &interpreter, list<Obj> arguments) override;
   string to_string() override;
-  FunctionCallable(Function<Obj>* declaration);
+  FunctionCallable(Function<Obj> *declaration);
 
- private:
-  Function<Obj>* declaration;
+private:
+  Function<Obj> *declaration;
 };
 
 #endif

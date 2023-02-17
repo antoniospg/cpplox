@@ -1,6 +1,13 @@
-fun sayHi(first, last) {
-  print(last);
+var a = 0;
+
+fun inc (b) {
+  a = a + b;
+  b = b - 1;
+
+  if (b > 0) {
+    inc(b);
+  }
 }
 
-sayHi("Ontem", "Nao");
-print("a");
+inc(5);
+print(a);

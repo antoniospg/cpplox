@@ -6,6 +6,7 @@
 #include <variant>
 
 #include "Callable.h"
+#include "Return.h"
 
 using namespace std;
 
@@ -30,9 +31,11 @@ Obj Interpreter::visitExprLogical(Logical<Obj> *expr) {
   Obj left = evaluate(expr->left);
 
   if (expr->op.type == OR) {
-    if (isTrue(left)) return left;
+    if (isTrue(left))
+      return left;
   } else {
-    if (!isTrue(left)) return left;
+    if (!isTrue(left))
+      return left;
   }
 
   return evaluate(expr->right);
@@ -46,13 +49,13 @@ Obj Interpreter::visitExprUnary(Unary<Obj> *expr) {
   Obj right = evaluate(expr->right);
 
   switch (expr->op.type) {
-    case MINUS:
-      checkNumberOperand(expr->op, right);
-      return -get<double>(right);
-    case BANG:
-      return isTrue(right);
-    default:
-      break;
+  case MINUS:
+    checkNumberOperand(expr->op, right);
+    return -get<double>(right);
+  case BANG:
+    return isTrue(right);
+  default:
+    break;
   }
 
   return monostate();
@@ -71,7 +74,8 @@ Obj Interpreter::visitExprCall(Call<Obj> *expr) {
   auto callee = evaluate(expr->callee);
 
   list<Obj> arguments;
-  for (auto arg : expr->arguments) arguments.push_back(evaluate(arg));
+  for (auto arg : expr->arguments)
+    arguments.push_back(evaluate(arg));
 
   if (!holds_alternative<Callable *>(callee))
     throw RuntimeError(expr->paren, "Can only call functions and classes.");
@@ -90,45 +94,45 @@ Obj Interpreter::visitExprBinary(Binary<Obj> *expr) {
   Obj right = evaluate(expr->right);
 
   switch (expr->op.type) {
-    case GREATER:
-      checkNumberOperand(expr->op, left, right);
-      return get<double>(left) > get<double>(right);
-    case GREATER_EQUAL:
-      checkNumberOperand(expr->op, left, right);
-      return get<double>(left) >= get<double>(right);
-    case LESS:
-      checkNumberOperand(expr->op, left, right);
-      return get<double>(left) < get<double>(right);
-    case LESS_EQUAL:
-      checkNumberOperand(expr->op, left, right);
-      return get<double>(left) <= get<double>(right);
-    case EQUAL_EQUAL:
-      checkNumberOperand(expr->op, left, right);
-      return isEqual(left, right);
-    case BANG_EQUAL:
-      checkNumberOperand(expr->op, left, right);
-      return !isEqual(left, right);
-    case PLUS:
-      if (holds_alternative<double>(left) && holds_alternative<double>(right))
-        return get<double>(left) + get<double>(right);
+  case GREATER:
+    checkNumberOperand(expr->op, left, right);
+    return get<double>(left) > get<double>(right);
+  case GREATER_EQUAL:
+    checkNumberOperand(expr->op, left, right);
+    return get<double>(left) >= get<double>(right);
+  case LESS:
+    checkNumberOperand(expr->op, left, right);
+    return get<double>(left) < get<double>(right);
+  case LESS_EQUAL:
+    checkNumberOperand(expr->op, left, right);
+    return get<double>(left) <= get<double>(right);
+  case EQUAL_EQUAL:
+    checkNumberOperand(expr->op, left, right);
+    return isEqual(left, right);
+  case BANG_EQUAL:
+    checkNumberOperand(expr->op, left, right);
+    return !isEqual(left, right);
+  case PLUS:
+    if (holds_alternative<double>(left) && holds_alternative<double>(right))
+      return get<double>(left) + get<double>(right);
 
-      if (holds_alternative<string>(left) && holds_alternative<string>(right))
-        return get<string>(left) + get<string>(right);
+    if (holds_alternative<string>(left) && holds_alternative<string>(right))
+      return get<string>(left) + get<string>(right);
 
-      throw RuntimeError(expr->op, "Operands must be two numbers or strings");
+    throw RuntimeError(expr->op, "Operands must be two numbers or strings");
 
-      break;
-    case MINUS:
-      checkNumberOperand(expr->op, left, right);
-      return get<double>(left) - get<double>(right);
-    case SLASH:
-      checkNumberOperand(expr->op, left, right);
-      return get<double>(left) / get<double>(right);
-    case STAR:
-      checkNumberOperand(expr->op, left, right);
-      return get<double>(left) * get<double>(right);
-    default:
-      break;
+    break;
+  case MINUS:
+    checkNumberOperand(expr->op, left, right);
+    return get<double>(left) - get<double>(right);
+  case SLASH:
+    checkNumberOperand(expr->op, left, right);
+    return get<double>(left) / get<double>(right);
+  case STAR:
+    checkNumberOperand(expr->op, left, right);
+    return get<double>(left) * get<double>(right);
+  default:
+    break;
   }
 
   return monostate();
@@ -158,19 +162,32 @@ Obj Interpreter::visitStmtIf(If<Obj> *stmt) {
 Obj Interpreter::visitStmtPrint(Print<Obj> *stmt) {
   auto value = evaluate(reinterpret_cast<Expr<Obj> *>(stmt->expr));
   cout << to_string(value) << endl;
+
+  return monostate();
+}
+
+Obj Interpreter::visitStmtReturn(Return<Obj> *stmt) {
+  Obj value = monostate();
+  if (stmt->value)
+    value = evaluate(stmt->value);
+
+  throw new ReturnError(value);
+
   return monostate();
 }
 
 Obj Interpreter::visitStmtVar(Var<Obj> *stmt) {
   Obj val = monostate();
-  if (stmt->initializer != nullptr) val = evaluate(stmt->initializer);
+  if (stmt->initializer != nullptr)
+    val = evaluate(stmt->initializer);
 
   env->define(stmt->name.lexeme, val);
   return monostate();
 }
 
 Obj Interpreter::visitStmtWhile(While<Obj> *stmt) {
-  while (isTrue(evaluate(stmt->condition))) execute(stmt->body);
+  while (isTrue(evaluate(stmt->condition)))
+    execute(stmt->body);
 
   return monostate();
 }
@@ -187,7 +204,8 @@ bool Interpreter::isTrue(Obj value) {
 }
 
 void Interpreter::checkNumberOperand(Token token, Obj operand) {
-  if (holds_alternative<double>(operand)) return;
+  if (holds_alternative<double>(operand))
+    return;
   throw RuntimeError(token, "Operand must be a number!");
 }
 
@@ -212,7 +230,8 @@ void Interpreter::executeBlock(list<Stmt<Obj> *> stmts, Environment *env) {
   try {
     this->env = env;
 
-    for (auto s : stmts) execute(s);
+    for (auto s : stmts)
+      execute(s);
   } catch (const RuntimeError &err) {
     this->env = previous;
   }
@@ -220,7 +239,8 @@ void Interpreter::executeBlock(list<Stmt<Obj> *> stmts, Environment *env) {
 
 void Interpreter::interpret(vector<Stmt<Obj> *> statements) {
   try {
-    for (auto &statement : statements) execute(statement);
+    for (auto &statement : statements)
+      execute(statement);
   } catch (const RuntimeError &err) {
     runtimeError(err);
   }

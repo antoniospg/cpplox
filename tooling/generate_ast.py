@@ -53,6 +53,10 @@ stmt_ast_types = [
     ("Print", [
         ("Expr<T> *", "expr")
     ]),
+    ("Return", [
+        ("Token", "keyword"),
+        ("Expr<T> *", "value")
+    ]),
     ("Var", [
         ("Token", "name"),
         ("Expr<T> *", "initializer"),
