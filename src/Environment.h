@@ -16,6 +16,7 @@ private:
 public:
   Environment();
   Environment(Environment *enclosing);
+  void dumpValues();
   void define(string name, Obj val);
   void assign(Token name, Obj value);
   Obj get(Token name);

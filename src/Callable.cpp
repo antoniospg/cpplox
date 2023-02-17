@@ -1,6 +1,7 @@
 #include "Callable.h"
 
 #include <chrono>
+#include <iostream>
 #include <string>
 
 using namespace std::chrono;
@@ -28,8 +29,11 @@ Obj FunctionCallable::call(Interpreter& interpreter, list<Obj> arguments) {
 
   auto param_itr = declaration->params.begin();
   auto args_itr = arguments.begin();
-  for (size_t i = 0; i < declaration->params.size(); i++)
+  for (size_t i = 0; i < declaration->params.size(); i++) {
     env->define((*param_itr).lexeme, (*args_itr));
+    param_itr++;
+    args_itr++;
+  }
 
   interpreter.executeBlock(declaration->body, env);
   return monostate();

@@ -38,3 +38,8 @@ Obj Environment::get(Token name) {
 }
 
 void Environment::clear() { values.clear(); }
+
+void Environment::dumpValues() {
+  for (auto [k, v] : values)
+    cout << "env_dump " << k << endl;
+}
