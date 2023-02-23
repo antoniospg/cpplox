@@ -1,13 +1,7 @@
-var a = 0;
-
-fun inc (b) {
-  a = a + b;
-  b = b - 1;
-
-  if (b > 0) {
-    inc(b);
-  }
+fun fib(n) {
+  if (n <= 1) return n;
+  return fib(n - 2) + fib(n - 1);
 }
 
-inc(5);
+var a = fib(4);
 print(a);

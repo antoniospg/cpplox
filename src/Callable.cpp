@@ -22,11 +22,12 @@ Obj ClockCallable::call(Interpreter &interpreter, list<Obj> arguments) {
 string ClockCallable::to_string() { return "<native fn>"; }
 
 // Function stuff
-FunctionCallable::FunctionCallable(Function<Obj> *declaration)
-    : declaration(declaration) {}
+FunctionCallable::FunctionCallable(Function<Obj> *declaration,
+                                   Environment *closure)
+    : declaration(declaration), closure(closure) {}
 
 Obj FunctionCallable::call(Interpreter &interpreter, list<Obj> arguments) {
-  auto env = new Environment(interpreter.globals);
+  auto env = new Environment(closure);
 
   auto param_itr = declaration->params.begin();
   auto args_itr = arguments.begin();
@@ -38,7 +39,7 @@ Obj FunctionCallable::call(Interpreter &interpreter, list<Obj> arguments) {
 
   try {
     interpreter.executeBlock(declaration->body, env);
-  } catch (ReturnError ret) {
+  } catch (const ReturnError &ret) {
     return ret.value;
   }
 

@@ -144,7 +144,7 @@ Obj Interpreter::visitStmtExpression(Expression<Obj> *stmt) {
 }
 
 Obj Interpreter::visitStmtFunction(Function<Obj> *stmt) {
-  FunctionCallable *function = new FunctionCallable(stmt);
+  FunctionCallable *function = new FunctionCallable(stmt, env);
   env->define(stmt->name.lexeme, function);
   return monostate();
 }
@@ -171,7 +171,7 @@ Obj Interpreter::visitStmtReturn(Return<Obj> *stmt) {
   if (stmt->value)
     value = evaluate(stmt->value);
 
-  throw new ReturnError(value);
+  throw ReturnError(value);
 
   return monostate();
 }

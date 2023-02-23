@@ -22,7 +22,8 @@ public:
   int arity() override;
   Obj call(Interpreter &interpreter, list<Obj> arguments) override;
   string to_string() override;
-  FunctionCallable(Function<Obj> *declaration);
+  Environment* closure;
+  FunctionCallable(Function<Obj> *declaration, Environment* closure);
 
 private:
   Function<Obj> *declaration;
